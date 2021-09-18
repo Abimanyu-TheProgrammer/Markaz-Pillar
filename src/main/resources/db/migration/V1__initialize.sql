@@ -7,5 +7,6 @@ CREATE TABLE registered_users (
     full_name varchar(50) NOT NULL,
     phone_num bigint(20) NOT NULL,
     address varchar(100) NOT NULL,
-    password varchar(100) NOT NULL
+    password varchar(100) NOT NULL,
+    UNIQUE (email)
 ) ENGINE=INNODB ;

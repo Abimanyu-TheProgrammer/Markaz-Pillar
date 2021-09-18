@@ -1,12 +1,16 @@
 package com.markaz.pillar.models;
 
 import com.markaz.pillar.validation.ValidPassword;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Data
+@Getter
+@Setter
+@ToString(of = "username")
+@NoArgsConstructor
 @Entity
 @Table(name = "registered_users")
 public class User {
@@ -15,22 +19,23 @@ public class User {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private long id;
 
-    @NotNull
+    @NotBlank
+    @Column(unique = true)
     private String email;
 
-    @NotNull
+    @NotBlank
     private String username;
 
-    @NotNull
+    @NotBlank
     private String fullName;
 
     @NotNull
     private long phoneNum;
 
-    @NotNull
+    @NotBlank
     private String address;
 
-    @NotNull
+    @NotBlank
     @ValidPassword
     private String password;
 }
