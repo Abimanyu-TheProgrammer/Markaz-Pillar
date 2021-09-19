@@ -3,6 +3,7 @@ package com.markaz.pillar.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.markaz.pillar.models.User;
 import com.markaz.pillar.service.AuthService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,6 +57,20 @@ class AuthControllerTest {
         user.setPhoneNum(num);
         user.setAddress("di Jalan");
         user.setPassword("1234567a");
+
+        mockMvc.perform(post("/api/register")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(user))
+        ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterIfAllInputIsBlank() throws Exception {
+        User user = new User();
+        user.setUsername("");
+        user.setFullName("");
+        user.setAddress("");
+        user.setPassword("");
 
         mockMvc.perform(post("/api/register")
                 .contentType("application/json")
