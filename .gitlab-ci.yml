@@ -18,7 +18,7 @@ cache:
 build:
     stage: build
     script:
-        - ./gradlew --build-cache clean assemble
+        - gradle --build-cache clean assemble
     artifacts:
         when: on_success
         paths:
@@ -36,10 +36,10 @@ test:
      needs:
          - job: build
      script:
-         - ./gradlew check
-         - ./gradlew jacocoTestReport
-         - ./gradlew jacocoTestCoverageVerification
-         - ./gradlew jacocoMergeTest
+         - gradle check
+         - gradle jacocoTestReport
+         - gradle jacocoTestCoverageVerification
+         - gradle jacocoMergeTest
          - grep Total build/reports/jacoco/test/html/index.html
      cache:
          key: $CI_COMMIT_REF_NAME
@@ -87,4 +87,4 @@ sonarCheck:
         SONARQUBE_PROJECT_KEY: $SONARQUBE_PROJECT_KEY
         SONAR_TOKEN: $SONAR_TOKEN
     script:
-     - ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN
+     - gradle sonarqube -Dsonar.login=$SONAR_TOKEN
