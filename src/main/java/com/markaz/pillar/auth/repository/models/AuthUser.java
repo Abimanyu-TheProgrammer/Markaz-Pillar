@@ -81,6 +81,7 @@ public class AuthUser {
     @Column(name = "phone_num")
     private String phoneNum;
 
+    @NotBlank
     private String address;
 
     @CreatedDate
