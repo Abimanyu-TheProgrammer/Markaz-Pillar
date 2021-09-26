@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.markaz'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = "1.8"
 
 configurations {
     compileOnly {
@@ -68,6 +68,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testRuntime "com.h2database:h2:1.4.194"
 }
 
 test {
