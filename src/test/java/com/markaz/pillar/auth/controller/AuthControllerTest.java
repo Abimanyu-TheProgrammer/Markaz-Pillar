@@ -74,12 +74,6 @@ class AuthControllerTest {
                 .webAppContextSetup((WebApplicationContext) context)
                 .apply(springSecurity())
                 .build();
-
-        Role role = new Role();
-        role.setId(1);
-        role.setName("MEMBER");
-
-        roleRepository.saveAndFlush(role);
     }
 
     @Test
