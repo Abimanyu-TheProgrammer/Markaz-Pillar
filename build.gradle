@@ -2,6 +2,14 @@ plugins {
     id 'org.springframework.boot' version '2.4.7'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'org.sonarqube' version '2.7'
+    id 'jacoco'
+}
+
+apply plugin: "jacoco"
+
+jacoco {
+    toolVersion = "0.8.6"
 }
 
 group = 'com.markaz'
@@ -73,4 +81,49 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.enabled true
+    }
+}
+
+
+def allTestCoverageFile = "$buildDir/jacoco/allTestCoverage.exec"
+
+task jacocoMergeTest(type: JacocoMerge) {
+    destinationFile = file(allTestCoverageFile)
+    executionData = project.fileTree(dir: '.', include:'**/build/jacoco/test.exec')
+}
+
+task jacocoMerge(dependsOn: ['jacocoMergeTest']) {
+    // used to run the other merge tasks
+}
+
+subprojects {
+    sonarqube {
+        properties {
+            property "sonar.jacoco.reportPaths", allTestCoverageFile
+        }
+    }
+}
+
+projectKey = System.getenv('SONARQUBE_PROJECT_KEY')
+sonarUrl = System.getenv('SONARQUBE_URL')
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "markazpillar"
+        property "sonar.projectKey", projectKey
+        property "sonar.jacoco.reportPaths", allTestCoverageFile
+        property "sonar.host.url", sonarUrl
+        property("sonar.coverage.exclusions",
+                [
+                        "**/*Application**'"
+                ])
+
+    }
 }
