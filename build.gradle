@@ -111,15 +111,10 @@ subprojects {
     }
 }
 
-projectKey = System.getenv('SONARQUBE_PROJECT_KEY')
-sonarUrl = System.getenv('SONARQUBE_URL')
-
 sonarqube {
     properties {
         property "sonar.projectName", "markazpillar"
-        property "sonar.projectKey", projectKey
         property "sonar.jacoco.reportPaths", allTestCoverageFile
-        property "sonar.host.url", sonarUrl
         property("sonar.coverage.exclusions",
                 [
                         "**/*Application**'"
