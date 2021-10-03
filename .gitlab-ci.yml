@@ -54,6 +54,31 @@ test:
              junit: build/test-results/test/TEST-*.xml
      when: on_success
 
+staging:
+    stage: deploy
+    needs:
+        - job: test
+    before_script:
+        - apt-get update -qq
+        # Setup SSH deploy keys
+        - 'which ssh-agent || ( apt-get install -qq openssh-client )'
+        - 'which rsync || ( apt-get install -qq rsync )'
+        - eval $(ssh-agent -s)
+        - ssh-add <(echo "$SSH_STAGING_PRIVATE_KEY")
+        - mkdir -p ~/.ssh
+        - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    cache:
+        key: $CI_COMMIT_REF_NAME
+        policy: pull
+        paths:
+            - build
+            - .gradle
+    script:
+        - rsync -hvrPt ./build/libs/*.jar deploy-ci@staging.markazpillar.afriza.co:/home/deploy-ci/apps/backend/app.jar
+        - ssh deploy-ci@staging.markazpillar.afriza.co "sudo systemctl restart backend && sudo systemctl restart nginx"
+    only:
+        - staging
+
 production:
     stage: deploy
     needs:
@@ -74,8 +99,8 @@ production:
             - build
             - .gradle
     script:
-        - rsync -auv --delete -e ./build/libs/*.jar deploy-ci@markazpillar.afriza.co:/root/home/app/app.jar
-        - ssh deploy-ci@markazpillar.afriza.co "systemctl restart backend-api && systemctl restart nginx"
+        - rsync -hvrPt ./build/libs/*.jar deploy-ci@markazpillar.afriza.co:/home/deploy-ci/apps/backend/app.jar
+        - ssh deploy-ci@markazpillar.afriza.co "sudo systemctl restart backend && sudo systemctl restart nginx"
     only:
         - master
 
@@ -88,4 +113,4 @@ sonarCheck:
         SONARQUBE_PROJECT_KEY: $SONARQUBE_PROJECT_KEY
         SONAR_TOKEN: $SONAR_TOKEN
     script:
-     - ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN
+     - ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN -Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectKey=$SONARQUBE_PROJECT_KEY
