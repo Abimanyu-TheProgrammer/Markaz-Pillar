@@ -4,29 +4,57 @@ import com.markaz.pillar.auth.google.controller.model.TokenRequest;
 import com.markaz.pillar.auth.google.repository.GoogleTokenRepository;
 import com.markaz.pillar.auth.google.repository.model.GoogleToken;
 import com.markaz.pillar.auth.google.service.GoogleOAuthService;
+import com.markaz.pillar.auth.google.service.TokenType;
 import com.markaz.pillar.auth.google.service.model.CredentialResponse;
+import com.markaz.pillar.auth.jwt.controller.model.JwtResponse;
+import com.markaz.pillar.auth.jwt.service.AuthenticationService;
+import com.markaz.pillar.auth.repository.UserRepository;
 import com.markaz.pillar.auth.repository.models.AuthUser;
-import org.apache.commons.lang3.NotImplementedException;
+import com.markaz.pillar.auth.service.AuthService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/oauth")
 @PreAuthorize("permitAll()")
+@Slf4j
 public class OAuthController {
     @Value("${service.jwt.state.length}")
     private int stateExpire;
 
     private GoogleTokenRepository repository;
     private GoogleOAuthService service;
+    private UserRepository userRepository;
+    private AuthenticationService authenticationService;
+    private AuthService authService;
+
+    @Autowired
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @Autowired
+    public void setAuthenticationService(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Autowired
     public void setService(GoogleOAuthService service) {
@@ -53,16 +81,51 @@ public class OAuthController {
     }
 
     @PostMapping(value = "/token", params = {"state"})
-    @ResponseStatus(HttpStatus.CREATED)
-    public CredentialResponse generateToken(@RequestParam String state, @RequestBody @Valid TokenRequest request) {
+    public ResponseEntity<?> generateToken(@RequestParam String state, @RequestBody @Valid TokenRequest request) throws NoSuchAlgorithmException {
         GoogleToken token = repository.createToken(state, request.getCode());
+        CredentialResponse response = service.getCredentials(token);
 
-        return service.getCredentials(token);
+        Optional<AuthUser> optional = userRepository.findByEmail(response.getEmail());
+        if(optional.isPresent()) {
+            AuthUser user = optional.get();
+            token.setState(null);
+            user.setToken(token);
+            userRepository.save(user);
+
+            authenticationService.authenticate(user.getEmail());
+
+            return ResponseEntity.ok(authenticationService.generateTokens(user.getEmail()));
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping(value = "/create", params = {"state"})
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthUser createUserFromOAuth(@RequestParam String state, @RequestBody AuthUser request) {
-        throw new NotImplementedException();
+    public JwtResponse createUserFromOAuth(@RequestParam String state, @Valid @RequestBody AuthUser request) throws NoSuchAlgorithmException {
+        GoogleToken token = repository.getByState(state);
+        if(!service.checkToken(token, TokenType.ACCESS_TOKEN)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad State!");
+        }
+
+        CredentialResponse credential = service.getCredentials(token);
+        if(!credential.getEmail().equals(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad State!");
+        }
+
+        AuthUser user = userRepository.findByEmail(request.getEmail())
+                .orElseGet(() -> {
+                    AuthUser temp = authService.register(request);
+
+                    token.setState(null);
+                    token.setAccount(temp);
+                    repository.save(token);
+
+                    return temp;
+                });
+
+        authenticationService.authenticate(user.getEmail());
+
+        return authenticationService.generateTokens(request.getEmail());
     }
 }
