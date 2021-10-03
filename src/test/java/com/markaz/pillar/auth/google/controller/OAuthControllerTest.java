@@ -5,10 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.markaz.pillar.auth.google.repository.GoogleTokenRepository;
 import com.markaz.pillar.auth.google.repository.model.GoogleToken;
 import com.markaz.pillar.auth.google.service.GoogleOAuthService;
+import com.markaz.pillar.auth.google.service.TokenType;
 import com.markaz.pillar.auth.google.service.model.CredentialResponse;
 import com.markaz.pillar.auth.google.service.model.TokenResponse;
+import com.markaz.pillar.auth.jwt.controller.model.JwtResponse;
+import com.markaz.pillar.auth.jwt.service.AuthenticationService;
+import com.markaz.pillar.auth.repository.UserRepository;
+import com.markaz.pillar.auth.repository.models.AuthUser;
+import com.markaz.pillar.auth.service.AuthService;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -24,6 +29,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -44,6 +50,15 @@ class OAuthControllerTest {
 
     @Mock
     private GoogleOAuthService service;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private AuthService authService;
+
+    @Mock
+    private AuthenticationService authenticationService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -137,12 +152,103 @@ class OAuthControllerTest {
     }
 
     @Test
-    void createUserFromOAuth() {
-        Assertions.fail();
+    void createUserFromOAuth() throws Exception {
+        String testEmail = "test.email@gmail.com";
+        String testState = "testState";
+        String request = "{\n" +
+                "    \"email\" : \"test.email@gmail.com\",\n" +
+                "    \"username\" : \"hazmi\",\n" +
+                "    \"fullName\": \"wishnu hazmi lazuardi\",\n" +
+                "    \"phoneNum\": \"08159774247\",\n" +
+                "    \"password\": \"Admin123\",\n" +
+                "    \"address\": \"Jl. Jakarta jakarta\"\n" +
+                "}";
+
+        GoogleToken token = new GoogleToken();
+        token.setState(testState);
+        Mockito.when(repository.getByState(testState))
+                .thenReturn(token);
+        Mockito.when(service.checkToken(token, TokenType.ACCESS_TOKEN))
+                .thenReturn(true);
+
+        CredentialResponse response = new CredentialResponse();
+        response.setEmail(testEmail);
+        Mockito.when(service.getCredentials(token))
+                .thenReturn(response);
+
+        Mockito.when(userRepository.findByEmail(testEmail))
+                .thenReturn(Optional.empty());
+
+        AuthUser user = mapper.readValue(request, AuthUser.class);
+        Mockito.when(authService.register(any(AuthUser.class)))
+                .thenReturn(user);
+
+        Mockito.when(authenticationService.generateTokens(testEmail))
+                .thenReturn(new JwtResponse("testAccess", "testRefresh"));
+
+        mockMvc.perform(
+                        post("/oauth/create")
+                                .characterEncoding("utf-8")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .queryParam("state", testState)
+                                .content(request)
+                )
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken").exists());
+
+        Mockito.verify(authService, atMostOnce()).register(any(AuthUser.class));
+        Mockito.verify(authenticationService, atMostOnce()).authenticate(testEmail);
+        Mockito.verify(authenticationService, atMostOnce()).generateTokens(testEmail);
     }
 
     @Test
-    void createUserLogsIn_WhenEmailExists() {
-        Assertions.fail();
+    void createUserLogsIn_WhenEmailExists() throws Exception {
+        String testEmail = "test.email@gmail.com";
+        String testState = "testState";
+        String request = "{\n" +
+                "    \"email\" : \"test.email@gmail.com\",\n" +
+                "    \"username\" : \"hazmi\",\n" +
+                "    \"fullName\": \"wishnu hazmi lazuardi\",\n" +
+                "    \"phoneNum\": \"08159774247\",\n" +
+                "    \"password\": \"Admin123\",\n" +
+                "    \"address\": \"Jl. Jakarta jakarta\"\n" +
+                "}";
+
+        GoogleToken token = new GoogleToken();
+        token.setState(testState);
+        Mockito.when(repository.getByState(testState))
+                .thenReturn(token);
+        Mockito.when(service.checkToken(token, TokenType.ACCESS_TOKEN))
+                .thenReturn(true);
+
+        CredentialResponse response = new CredentialResponse();
+        response.setEmail(testEmail);
+        Mockito.when(service.getCredentials(token))
+                .thenReturn(response);
+
+        AuthUser user = mapper.readValue(request, AuthUser.class);
+        Mockito.when(userRepository.findByEmail(testEmail))
+                .thenReturn(Optional.of(user));
+
+        Mockito.when(authenticationService.generateTokens(testEmail))
+                .thenReturn(new JwtResponse("testAccess", "testRefresh"));
+
+        mockMvc.perform(
+                        post("/oauth/create")
+                                .characterEncoding("utf-8")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .queryParam("state", testState)
+                                .content(request)
+                )
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken").exists());
+
+        Mockito.verify(authService, never()).register(any(AuthUser.class));
+        Mockito.verify(authenticationService, atMostOnce()).authenticate(testEmail);
+        Mockito.verify(authenticationService, atMostOnce()).generateTokens(testEmail);
     }
 }

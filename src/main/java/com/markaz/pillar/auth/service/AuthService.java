@@ -35,7 +35,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void register(@Valid AuthUser data){
+    public AuthUser register(@Valid AuthUser data){
         Optional<AuthUser> existingUser = userRepository.findByEmail(data.getEmail());
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("Email is already associated with a user");
@@ -44,7 +44,7 @@ public class AuthService {
         data.setRole(roleRepository.findByName("MEMBER"));
         data.setPassword(passwordEncoder.encode(data.getPassword()));
 
-        userRepository.saveAndFlush(data);
+        return userRepository.saveAndFlush(data);
     }
 }
 

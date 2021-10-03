@@ -17,5 +17,10 @@ public interface GoogleTokenRepository extends JpaRepository<GoogleToken, Intege
     void deleteExistingTokens(int userId);
 
     GoogleToken findFirstByAccount_IdOrderByCreatedAtDesc(int id);
+
+    @Query(
+            value = "select * from google_token where state = ?1 and is_active = 1 and current_timestamp() < expire_at",
+            nativeQuery = true
+    )
     GoogleToken getByState(String state);
 }

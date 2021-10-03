@@ -5,7 +5,6 @@ import com.markaz.pillar.auth.google.advice.limiter.annotation.Limited;
 import com.markaz.pillar.auth.google.repository.model.GoogleToken;
 import com.markaz.pillar.auth.google.service.model.CredentialResponse;
 import com.markaz.pillar.auth.google.service.model.TokenResponse;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,26 +17,21 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.InetAddress;
 import java.util.Collections;
 
 @Service
 public class GoogleOAuthService {
-    private final String FQDN;
-
     @Value("${service.google.client.id}")
     private String clientId;
 
     @Value("${service.google.client.secret}")
     private String clientSecret;
 
+    @Value("${service.google.client.redirect_url}")
+    private String redirectURL;
+
     private RestTemplate authTemplate;
     private RestTemplate restTemplate;
-
-    @SneakyThrows
-    public GoogleOAuthService() {
-        FQDN = InetAddress.getLocalHost().getCanonicalHostName();
-    }
 
     @Autowired
     @Qualifier("googleAuthRestTemplate")
@@ -62,7 +56,7 @@ public class GoogleOAuthService {
         data.add("grant_type", "authorization_code");
         data.add("client_id", clientId);
         data.add("client_secret", clientSecret);
-        data.add("redirect_uri", FQDN);
+        data.add("redirect_uri", redirectURL);
 
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(data, headers);
         return authTemplate.exchange("/token", HttpMethod.POST, entity, TokenResponse.class).getBody();
@@ -109,7 +103,7 @@ public class GoogleOAuthService {
         data.add("grant_type", "refresh_token");
         data.add("client_id", clientId);
         data.add("client_secret", clientSecret);
-        data.add("redirect_uri", FQDN);
+        data.add("redirect_uri", redirectURL);
 
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(data, headers);
         return authTemplate.exchange("/token", HttpMethod.POST, entity, TokenResponse.class).getBody();
