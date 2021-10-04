@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
-    public static AuthUser authUser;
+    private static AuthUser authUser;
 
     @Mock
     private UserRepository userRepository;

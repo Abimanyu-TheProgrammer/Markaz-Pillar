@@ -29,8 +29,7 @@ public class ValidationExceptionHandler {
                     } else {
                         errors.put(error.getField(), error.getDefaultMessage());
                     }
-                }
-        );
+                });
 
         return errors;
     }

@@ -28,7 +28,8 @@ public class GenericResponseHandler implements ResponseBodyAdvice {
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
+                                  Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         Pattern pattern = Pattern.compile("com\\.markaz\\.pillar.*", Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(returnType.getDeclaringClass().getName());
         if(!matcher.matches()) {

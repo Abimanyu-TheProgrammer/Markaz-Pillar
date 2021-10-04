@@ -64,11 +64,9 @@ class GoogleOAuthServiceTest {
                 .andExpect(content().string(Matchers.containsString("redirect_uri")))
                 .andExpect(content().string(Matchers.containsString("grant_type")))
                 .andExpect(content().string(Matchers.containsString("code")))
-                .andRespond(
-                        withStatus(HttpStatus.OK)
+                .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(response))
-                );
+                        .body(mapper.writeValueAsString(response)));
 
 
         TokenResponse ans = service.getToken("test");
@@ -88,11 +86,9 @@ class GoogleOAuthServiceTest {
                 )
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(queryParam("alt", "json"))
-                .andRespond(
-                        withStatus(HttpStatus.OK)
+                .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(response))
-                );
+                        .body(mapper.writeValueAsString(response)));
 
         GoogleToken token = Mockito.mock(GoogleToken.class);
         Mockito.when(token.getExpireAt()).thenReturn(LocalDateTime.now().plusSeconds(3600));
@@ -116,11 +112,9 @@ class GoogleOAuthServiceTest {
                 )
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(queryParam("id_token", Matchers.any(String.class)))
-                .andRespond(
-                        withStatus(HttpStatus.OK)
+                .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(response))
-                );
+                        .body(mapper.writeValueAsString(response)));
 
         GoogleToken token = Mockito.mock(GoogleToken.class);
         boolean ans = service.checkToken(token, TokenType.ID_TOKEN);
@@ -141,11 +135,9 @@ class GoogleOAuthServiceTest {
                 )
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(queryParam("access_token", Matchers.any(String.class)))
-                .andRespond(
-                        withStatus(HttpStatus.OK)
+                .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(mapper.writeValueAsString(response))
-                );
+                        .body(mapper.writeValueAsString(response)));
 
         GoogleToken token = Mockito.mock(GoogleToken.class);
         boolean ans = service.checkToken(token, TokenType.ACCESS_TOKEN);
@@ -171,11 +163,9 @@ class GoogleOAuthServiceTest {
                 .andExpect(content().string(Matchers.containsString("redirect_uri")))
                 .andExpect(content().string(Matchers.containsString("grant_type")))
                 .andExpect(content().string(Matchers.containsString("refresh_token")))
-                .andRespond(
-                        withStatus(HttpStatus.OK)
+                .andRespond(withStatus(HttpStatus.OK)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .body(mapper.writeValueAsString(response))
-                );
+                                .body(mapper.writeValueAsString(response)));
 
 
         TokenResponse ans = service.refreshToken("test");
