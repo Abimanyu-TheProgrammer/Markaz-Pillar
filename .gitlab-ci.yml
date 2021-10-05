@@ -93,12 +93,15 @@ coverage:
 staging:
     stage: deploy
     image: ubuntu:latest
+    variables:
+        SSH_STAGING_PRIVATE_KEY: $SSH_STAGING_PRIVATE_KEY
     before_script:
         # Setup SSH deploy keys
-        - 'which ssh-agent || ( apt install -qq openssh-client )'
-        - 'which rsync || ( apt install -qq rsync )'
+        - apt-get update -y
+        - 'which ssh-agent || ( apt-get install -y openssh-client )'
+        - 'which rsync || ( apt-get install -y rsync )'
         - eval $(ssh-agent -s)
-        - ssh-add <(echo "$SSH_STAGING_PRIVATE_KEY")
+        - echo "$SSH_STAGING_PRIVATE_KEY" | tr -d '\r' | ssh-add -
         - mkdir -p ~/.ssh
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     cache:
@@ -117,12 +120,15 @@ staging:
 production:
     stage: deploy
     image: ubuntu:latest
+    variables:
+        SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
     before_script:
         # Setup SSH deploy keys
-        - 'which ssh-agent || ( apt install -qq openssh-client )'
-        - 'which rsync || ( apt install -qq rsync )'
+        - apt-get update -y
+        - 'which ssh-agent || ( apt-get install -y openssh-client )'
+        - 'which rsync || ( apt-get install -y rsync )'
         - eval $(ssh-agent -s)
-        - ssh-add <(echo "$SSH_PRIVATE_KEY")
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
         - mkdir -p ~/.ssh
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     cache:
