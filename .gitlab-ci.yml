@@ -101,7 +101,7 @@ staging:
         - 'which ssh-agent || ( apt-get install -y openssh-client )'
         - 'which rsync || ( apt-get install -y rsync )'
         - eval $(ssh-agent -s)
-        - echo "$SSH_STAGING_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+        - echo "${SSH_STAGING_PRIVATE_KEY}\n" | ssh-add -
         - mkdir -p ~/.ssh
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     cache:
@@ -128,7 +128,7 @@ production:
         - 'which ssh-agent || ( apt-get install -y openssh-client )'
         - 'which rsync || ( apt-get install -y rsync )'
         - eval $(ssh-agent -s)
-        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+        - echo "${SSH_PRIVATE_KEY}\n" | ssh-add -
         - mkdir -p ~/.ssh
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     cache:
