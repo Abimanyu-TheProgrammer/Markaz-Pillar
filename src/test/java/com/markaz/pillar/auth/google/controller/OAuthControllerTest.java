@@ -12,7 +12,7 @@ import com.markaz.pillar.auth.jwt.controller.model.JwtResponse;
 import com.markaz.pillar.auth.jwt.service.AuthenticationService;
 import com.markaz.pillar.auth.repository.UserRepository;
 import com.markaz.pillar.auth.repository.models.AuthUser;
-import com.markaz.pillar.auth.service.AuthService;
+import com.markaz.pillar.auth.service.RegistrationService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +55,7 @@ class OAuthControllerTest {
     private UserRepository userRepository;
 
     @Mock
-    private AuthService authService;
+    private RegistrationService registrationService;
 
     @Mock
     private AuthenticationService authenticationService;
@@ -180,7 +180,7 @@ class OAuthControllerTest {
                 .thenReturn(Optional.empty());
 
         AuthUser user = mapper.readValue(request, AuthUser.class);
-        Mockito.when(authService.register(any(AuthUser.class)))
+        Mockito.when(registrationService.register(any(AuthUser.class)))
                 .thenReturn(user);
 
         Mockito.when(authenticationService.generateTokens(testEmail))
@@ -198,7 +198,7 @@ class OAuthControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken").exists());
 
-        Mockito.verify(authService, atMostOnce()).register(any(AuthUser.class));
+        Mockito.verify(registrationService, atMostOnce()).register(any(AuthUser.class));
         Mockito.verify(authenticationService, atMostOnce()).authenticate(testEmail);
         Mockito.verify(authenticationService, atMostOnce()).generateTokens(testEmail);
     }
@@ -247,7 +247,7 @@ class OAuthControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken").exists());
 
-        Mockito.verify(authService, never()).register(any(AuthUser.class));
+        Mockito.verify(registrationService, never()).register(any(AuthUser.class));
         Mockito.verify(authenticationService, atMostOnce()).authenticate(testEmail);
         Mockito.verify(authenticationService, atMostOnce()).generateTokens(testEmail);
     }

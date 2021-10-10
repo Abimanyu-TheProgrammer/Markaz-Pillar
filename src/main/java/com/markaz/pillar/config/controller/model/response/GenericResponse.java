@@ -15,5 +15,7 @@ public class GenericResponse {
     private String message;
     private Object result;
     private Integer count;
-    private Long total;
+    private Integer page;
+    private Long totalElement;
+    private Integer totalPage;
 }

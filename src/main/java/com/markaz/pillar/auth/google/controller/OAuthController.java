@@ -10,7 +10,7 @@ import com.markaz.pillar.auth.jwt.controller.model.JwtResponse;
 import com.markaz.pillar.auth.jwt.service.AuthenticationService;
 import com.markaz.pillar.auth.repository.UserRepository;
 import com.markaz.pillar.auth.repository.models.AuthUser;
-import com.markaz.pillar.auth.service.AuthService;
+import com.markaz.pillar.auth.service.RegistrationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +39,11 @@ public class OAuthController {
     private GoogleOAuthService service;
     private UserRepository userRepository;
     private AuthenticationService authenticationService;
-    private AuthService authService;
+    private RegistrationService registrationService;
 
     @Autowired
-    public void setAuthService(AuthService authService) {
-        this.authService = authService;
+    public void setAuthService(RegistrationService registrationService) {
+        this.registrationService = registrationService;
     }
 
     @Autowired
@@ -115,7 +115,7 @@ public class OAuthController {
 
         AuthUser user = userRepository.findByEmail(request.getEmail())
                 .orElseGet(() -> {
-                    AuthUser temp = authService.register(request);
+                    AuthUser temp = registrationService.register(request);
 
                     token.setState(null);
                     token.setAccount(temp);

@@ -51,9 +51,11 @@ public class GenericResponseHandler implements ResponseBodyAdvice {
                     .timestamp(LocalDateTime.now())
                     .statusCode(servletResponse.getStatus())
                     .message(message)
-                    .result(body)
-                    .total(((Page<?>) body).getTotalElements())
+                    .result(((Page<?>) body).getContent())
+                    .page(((Page<?>) body).getNumber())
                     .count(((Page<?>) body).getNumberOfElements())
+                    .totalElement(((Page<?>) body).getTotalElements())
+                    .totalPage(((Page<?>) body).getTotalPages())
                     .build();
         }
         if(body instanceof Collection) {
