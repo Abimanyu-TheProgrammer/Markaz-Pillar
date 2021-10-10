@@ -4,6 +4,8 @@ import com.markaz.pillar.tools.file.FileStorageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
+
 @Service("staticFileStorage")
 public class StaticFileStorage extends FileStorageService {
     @Value("${service.storage.root}")
@@ -26,7 +28,7 @@ public class StaticFileStorage extends FileStorageService {
     }
 
     @Override
-    public String resolveAbsoluteURL(String directory, String filename) {
-        return String.format("%s%s/%s", rootUrl, directory, filename);
+    public String resolveAbsoluteURL(Path relativeDir, String filename) {
+        return String.format("%s%s/%s", rootUrl, relativeDir.toString(), filename);
     }
 }
