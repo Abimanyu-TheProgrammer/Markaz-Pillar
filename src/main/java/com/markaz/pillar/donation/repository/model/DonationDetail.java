@@ -55,10 +55,10 @@ public class DonationDetail {
     @NotNull
     private long nominal;
 
-    @Formula("(select sum(u.amount) " +
+    @Formula("coalesce((select sum(u.amount) " +
             "from user_donation u " +
             "where u.donation_id = id and u.status = 'DONASI_DITERIMA'" +
-            "group by u.donation_id)")
+            "group by u.donation_id), 0)")
     private Long donated;
 
     @Column(name = "contact_person")
