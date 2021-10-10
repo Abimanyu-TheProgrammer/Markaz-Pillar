@@ -1,5 +1,6 @@
 package com.markaz.pillar.tools.file;
 
+import com.github.slugify.Slugify;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,16 +12,22 @@ import java.nio.file.Paths;
 import java.util.Objects;
 
 public abstract class FileStorageService {
+    private final Slugify slugify;
+
+    protected FileStorageService() {
+        this.slugify = new Slugify();
+    }
+
     public String saveFile(MultipartFile file, Path path) throws IOException {
         validateFile(file);
 
-        String uploadDir = getRootDirectory() + getDirectory();
+        Path relativeDir = Paths.get(getDirectory(), path.toString());
         String fileName = cleanFileName(file);
-        Path resolved = resolveUploadDir(uploadDir, path, fileName);
+        Path resolved = resolveUploadDir(relativeDir, fileName);
 
         write(resolved, file);
 
-        return resolveAbsoluteURL(getDirectory(), fileName);
+        return resolveAbsoluteURL(relativeDir, fileName);
     }
 
     protected void validateFile(MultipartFile file) {
@@ -29,13 +36,13 @@ public abstract class FileStorageService {
         }
     }
 
-    protected Path resolveUploadDir(String directory, Path path, String fileName) throws IOException {
-        Path uploadPath = Paths.get(directory, path.toString());
-        if(!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
+    protected Path resolveUploadDir(Path relativeDir, String fileName) throws IOException {
+        Path path = Paths.get(getRootDirectory(), relativeDir.toString());
+        if(!Files.exists(path)) {
+            Files.createDirectories(path);
         }
 
-        return uploadPath.resolve(fileName);
+        return path.resolve(fileName);
     }
 
     protected void write(Path path, MultipartFile file) throws IOException {
@@ -46,7 +53,7 @@ public abstract class FileStorageService {
         try {
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             fileName = String.format("%s_%s.%s",
-                    fileName.substring(0, fileName.lastIndexOf(".")),
+                    slugify.slugify(fileName.substring(0, fileName.lastIndexOf("."))),
                     RandomStringUtils.randomAlphanumeric(8),
                     fileName.substring(fileName.lastIndexOf(".") + 1));
             return fileName;
@@ -57,5 +64,5 @@ public abstract class FileStorageService {
 
     protected abstract String getDirectory();
     protected abstract String getRootDirectory();
-    protected abstract String resolveAbsoluteURL(String directory, String filename);
+    protected abstract String resolveAbsoluteURL(Path relativeDir, String filename);
 }
