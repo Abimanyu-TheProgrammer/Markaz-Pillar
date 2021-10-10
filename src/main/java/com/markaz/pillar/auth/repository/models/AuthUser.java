@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.markaz.pillar.auth.google.repository.model.GoogleToken;
 import com.markaz.pillar.config.validation.ValidPassword;
+import com.markaz.pillar.donation.repository.model.UserDonation;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -94,4 +96,7 @@ public class AuthUser {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<UserDonation> donations;
 }

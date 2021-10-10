@@ -21,7 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTest {
+public class RegistrationServiceTest {
     private static AuthUser authUser;
 
     @Mock
@@ -31,7 +31,7 @@ public class AuthServiceTest {
     private RoleRepository roleRepository;
 
     @InjectMocks
-    private AuthService authService;
+    private RegistrationService registrationService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -57,7 +57,7 @@ public class AuthServiceTest {
         Mockito.when(userRepository.saveAndFlush(authUser)).thenReturn(authUser);
         Mockito.when(userRepository.findByEmail("jarfix01@gmail.com")).thenReturn(Optional.empty());
 
-        authService.register(authUser);
+        registrationService.register(authUser);
         verify(userRepository, times(1)).findByEmail("jarfix01@gmail.com");
         verify(userRepository, times(1)).saveAndFlush(authUser);
     }
@@ -67,7 +67,7 @@ public class AuthServiceTest {
         Mockito.when(userRepository.findByEmail("jarfix01@gmail.com")).thenReturn(Optional.of(authUser));
 
         try{
-            authService.register(authUser);
+            registrationService.register(authUser);
             verify(userRepository, times(1)).findByEmail("jarfix01@gmail.com");
             fail("Expected IllegalArgumentException");
         } catch(Exception e) {
