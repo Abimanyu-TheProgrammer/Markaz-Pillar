@@ -95,14 +95,14 @@ public class AdminSantriController {
                                       @RequestPart @Valid SantriRequestDTO santri) throws IOException {
         Santri entity = repository.getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri not found"));
-        if(repository.existsByNameAndMarkaz_Id(santri.getName(), entity.getMarkaz().getId())) {
+
+        if(entity.getName().equals(santri.getName())
+                && repository.existsByNameAndMarkaz_Id(santri.getName(), entity.getMarkaz().getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri with the same name exists");
         }
 
-        String slug = new Slugify().slugify(santri.getName());
-
         entity.setName(santri.getName());
-        entity.setSlug(slug);
+        entity.setSlug(new Slugify().slugify(santri.getName()));
         entity.setBackground(santri.getBackground());
         entity.setAddress(santri.getAddress());
         entity.setGender(santri.getGender());
