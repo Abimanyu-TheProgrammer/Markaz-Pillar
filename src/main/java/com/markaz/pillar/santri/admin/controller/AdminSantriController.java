@@ -96,7 +96,7 @@ public class AdminSantriController {
         Santri entity = repository.getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri not found"));
 
-        if(entity.getName().equals(santri.getName())
+        if(!entity.getName().equals(santri.getName())
                 && repository.existsByNameAndMarkaz_Id(santri.getName(), entity.getMarkaz().getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri with the same name exists");
         }
