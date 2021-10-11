@@ -41,6 +41,7 @@ public class MarkazSimpleDTO {
                 .id(obj.getId())
                 .slug(obj.getSlug())
                 .name(obj.getName())
+                .category(obj.getCategory())
                 .background(obj.getBackground())
                 .thumbnailURL(obj.getThumbnailURL());
 
