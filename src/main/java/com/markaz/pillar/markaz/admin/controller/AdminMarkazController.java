@@ -74,7 +74,11 @@ public class AdminMarkazController {
         return MarkazDetailDTO.mapFrom(repository.save(entity));
     }
 
-    @PutMapping(params = {"id"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(
+            value = "/edit",
+            params = {"id"},
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @ResponseMessage("Markaz is updated!")
     public MarkazDetailDTO updateById(@RequestParam int id,
                                       @RequestPart(required = false) MultipartFile thumbnail,

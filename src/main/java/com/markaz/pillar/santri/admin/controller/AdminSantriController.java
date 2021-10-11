@@ -88,7 +88,11 @@ public class AdminSantriController {
         return SantriDetailDTO.mapFrom(repository.save(entity));
     }
 
-    @PutMapping(params = {"id"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(
+            value = "/edit",
+            params = {"id"},
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @ResponseMessage("Santri is updated!")
     public SantriDetailDTO updateById(@RequestParam int id,
                                       @RequestPart(required = false) MultipartFile thumbnail,
