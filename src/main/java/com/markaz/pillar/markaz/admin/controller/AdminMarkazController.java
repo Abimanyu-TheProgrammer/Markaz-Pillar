@@ -82,7 +82,7 @@ public class AdminMarkazController {
         Markaz entity = repository.getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz not found"));
 
-        if(entity.getName().equals(markaz.getName()) && repository.existsByName(markaz.getName())) {
+        if(!entity.getName().equals(markaz.getName()) && repository.existsByName(markaz.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz with the same name exists");
         }
 
