@@ -79,20 +79,18 @@ public class AdminMarkazController {
     public MarkazDetailDTO updateById(@RequestParam int id,
                                       @RequestPart(required = false) MultipartFile thumbnail,
                                       @RequestPart @Valid MarkazRequestDTO markaz) throws IOException {
-        if(repository.existsByName(markaz.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz with the same name exists");
-        }
-
         Markaz entity = repository.getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz not found"));
+
+        if(entity.getName().equals(markaz.getName()) && repository.existsByName(markaz.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz with the same name exists");
+        }
 
         entity.setName(markaz.getName());
         entity.setBackground(markaz.getBackground());
         entity.setCategory(markaz.getCategory());
         entity.setAddress(markaz.getAddress());
-
-        String slug = new Slugify().slugify(markaz.getName());
-        entity.setSlug(slug);
+        entity.setSlug(new Slugify().slugify(markaz.getName()));
 
         if(thumbnail != null) {
             String thumbnailURL = fileStorage.saveFile(thumbnail, Paths.get("markaz", "thumbnail"));
