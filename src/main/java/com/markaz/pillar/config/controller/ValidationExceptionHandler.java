@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +38,15 @@ public class ValidationExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
     public Map<String, String> handleIllegalArguments(IllegalArgumentException e) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", e.getMessage());
+
+        return response;
+    }
+
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public Map<String, String> handleIllegalArguments(MaxUploadSizeExceededException e) {
         Map<String, String> response = new HashMap<>();
         response.put("message", e.getMessage());
 

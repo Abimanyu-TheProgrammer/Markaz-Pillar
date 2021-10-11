@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.util.Calendar;
+import java.util.List;
 
 @Service("rollingFileStorage")
 public class RollingFileStorage extends FileStorageService {
@@ -17,6 +18,9 @@ public class RollingFileStorage extends FileStorageService {
 
     @Value("${service.storage.url}")
     private String rootUrl;
+
+    @Value("#{'${service.storage.allowed-content-types}'.split(',')}")
+    private List<String> allowedContentTypes;
 
     @Override
     public String getDirectory() {
@@ -32,5 +36,10 @@ public class RollingFileStorage extends FileStorageService {
     @Override
     public String resolveAbsoluteURL(Path relativeDir, String filename) {
         return String.format("%s%s/%s", rootUrl, relativeDir.toString(), filename);
+    }
+
+    @Override
+    protected List<String> getAllowedContentType() {
+        return allowedContentTypes;
     }
 }

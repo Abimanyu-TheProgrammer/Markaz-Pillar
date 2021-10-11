@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class FileStorageService {
@@ -50,19 +51,29 @@ public abstract class FileStorageService {
     }
 
     protected String cleanFileName(MultipartFile file) {
-        try {
-            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            fileName = String.format("%s_%s.%s",
-                    slugify.slugify(fileName.substring(0, fileName.lastIndexOf("."))),
-                    RandomStringUtils.randomAlphanumeric(8),
-                    fileName.substring(fileName.lastIndexOf(".") + 1));
-            return fileName;
-        } catch (IndexOutOfBoundsException | NullPointerException e) {
-            throw new IllegalArgumentException("Invalid Filename!", e);
+        String contentType = file.getContentType();
+        if(getAllowedContentType().contains(contentType)) {
+            try {
+                String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+
+                fileName = String.format(
+                        "%s_%s.%s",
+                        slugify.slugify(fileName.substring(0, fileName.lastIndexOf("."))),
+                        RandomStringUtils.randomAlphanumeric(8),
+                        fileName.substring(fileName.lastIndexOf(".") + 1)
+                );
+
+                return fileName;
+            } catch (IndexOutOfBoundsException | NullPointerException e) {
+                throw new IllegalArgumentException("Invalid Filename!", e);
+            }
+        } else {
+            throw new IllegalArgumentException(String.format("File type %s is not allowed!", contentType));
         }
     }
 
     protected abstract String getDirectory();
     protected abstract String getRootDirectory();
     protected abstract String resolveAbsoluteURL(Path relativeDir, String filename);
+    protected abstract List<String> getAllowedContentType();
 }
