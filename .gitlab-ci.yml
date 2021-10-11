@@ -1,10 +1,7 @@
 stages:
     - build
-    - linter
     - test
-    - visualize
     - deploy
-    - sonar
 
 image: java:8-jdk
 before_script:
@@ -35,10 +32,10 @@ build:
             - .gradle
 
 linter:
-    stage: linter
+    stage: test
     script:
         - ./gradlew checkstyleMain checkstyleTest
-    needs: ["build"]
+    needs: [build]
     cache:
         key: $CI_COMMIT_REF_NAME
         policy: pull-push
@@ -59,7 +56,7 @@ test:
          - ./gradlew jacocoTestCoverageVerification
          - ./gradlew jacocoMergeTest
          - grep Total build/reports/jacoco/test/html/index.html
-     needs: ["build"]
+     needs: [build]
      cache:
          key: $CI_COMMIT_REF_NAME
          policy: pull-push
@@ -78,30 +75,30 @@ coverage:
     # Must be in a stage later than test-jdk11's stage.
     # The `visualize` stage does not exist by default.
     # Please define it first, or chose an existing stage like `deploy`.
-    stage: visualize
+    stage: deploy
     image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
+    needs: [test]
     script:
         # convert report from jacoco to cobertura, using relative project path
         - python /opt/cover2cover.py build/reports/jacoco/test/jacocoTestReport.xml $CI_PROJECT_DIR/src/main/java/ > build/cobertura.xml
-    needs: ["test"]
     dependencies:
         - test
     artifacts:
         reports:
             cobertura: build/cobertura.xml
+    when: on_success
 
 staging:
     stage: deploy
     image: ubuntu:latest
-    variables:
-        SSH_STAGING_PRIVATE_KEY: $SSH_STAGING_PRIVATE_KEY
+    needs: [test, linter]
     before_script:
         # Setup SSH deploy keys
         - apt-get update -y
         - 'which ssh-agent || ( apt-get install -y openssh-client )'
         - 'which rsync || ( apt-get install -y rsync )'
         - eval $(ssh-agent -s)
-        - echo "${SSH_STAGING_PRIVATE_KEY}\n" | ssh-add -
+        - echo "${SSH_STAGING_PRIVATE_KEY}" | ssh-add -
         - mkdir -p ~/.ssh
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     cache:
@@ -112,23 +109,22 @@ staging:
             - .gradle
     script:
         - rsync -hvrPt ./build/libs/*.jar deploy-ci@staging.markazpillar.afriza.co:/home/deploy-ci/apps/backend/app.jar
-        - ssh deploy-ci@staging.markazpillar.afriza.co "sudo systemctl restart backend && sudo systemctl restart nginx"
-    needs: ["linter", "test"]
+        - ssh deploy-ci@staging.markazpillar.afriza.co "sudo systemctl restart backend.service && sudo systemctl restart nginx.service"
+    when: on_success
     only:
         - master
 
 production:
     stage: deploy
     image: ubuntu:latest
-    variables:
-        SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
+    needs: [test, linter]
     before_script:
         # Setup SSH deploy keys
         - apt-get update -y
         - 'which ssh-agent || ( apt-get install -y openssh-client )'
         - 'which rsync || ( apt-get install -y rsync )'
         - eval $(ssh-agent -s)
-        - echo "${SSH_PRIVATE_KEY}\n" | ssh-add -
+        - echo "${SSH_PRIVATE_KEY}" | ssh-add -
         - mkdir -p ~/.ssh
         - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     cache:
@@ -139,17 +135,21 @@ production:
             - .gradle
     script:
         - rsync -hvrPt ./build/libs/*.jar deploy-ci@markazpillar.afriza.co:/home/deploy-ci/apps/backend/app.jar
-        - ssh deploy-ci@markazpillar.afriza.co "sudo systemctl restart backend && sudo systemctl restart nginx"
-    needs: ["test"]
+        - ssh deploy-ci@markazpillar.afriza.co "sudo systemctl restart backend.service && sudo systemctl restart nginx.service"
+    when: on_success
     only:
         - production
 
 sonarCheck:
-    stage: sonar
+    stage: deploy
+    needs: [test]
     variables:
         SONARQUBE_URL: $SONARQUBE_URL
         SONARQUBE_PROJECT_KEY: $SONARQUBE_PROJECT_KEY
         SONAR_TOKEN: $SONAR_TOKEN
     script:
      - ./gradlew sonarqube -Dsonar.login=$SONARQUBE_TOKEN -Dsonar.host.url=$SONARQUBE_URL -Dsonar.projectKey=$SONARQUBE_PROJECT_KEY
-    needs: ["test"]
+    when: on_success
+    only:
+        - master
+        - production
