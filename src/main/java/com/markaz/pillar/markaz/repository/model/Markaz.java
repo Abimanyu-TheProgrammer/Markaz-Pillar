@@ -30,6 +30,7 @@ import java.util.Set;
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
+@Where(clause = "is_active = 1")
 @SQLDelete(sql = "update markaz_data set is_active = false where id = ?")
 public class Markaz {
     @Id
