@@ -18,7 +18,21 @@ public final class DonationSpecs {
                         );
     }
 
-    public static Specification<DonationDetail> idLike(String id) {
+    public static Specification<DonationDetail> santriIdEquals(Integer id) {
+        return (root, query, builder) ->
+                id == null ?
+                        builder.conjunction() :
+                        builder.equal(root.get("santri").get("id"), id);
+    }
+
+    public static Specification<DonationDetail> markazIdEquals(Integer id) {
+        return (root, query, builder) ->
+                id == null ?
+                        builder.conjunction() :
+                        builder.equal(root.get("markaz").get("id"), id);
+    }
+
+    public static Specification<DonationDetail> uniqueIdLike(String id) {
         return (root, query, builder) ->
                 id == null ?
                         builder.conjunction() :

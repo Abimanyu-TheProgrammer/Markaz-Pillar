@@ -66,14 +66,15 @@ public class AdminDonationController {
                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortedStatus,
                                                  @RequestParam(defaultValue = "0") int page,
                                                  @RequestParam(defaultValue = "10") int n) {
-        Markaz markaz = markazRepository.getById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Markaz not Found!"));
+        if(markazRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Markaz not Found!");
+        }
 
         Specification<DonationDetail> searchSpec = Specification
-                .where(DonationSpecs.idLike(s)).or(DonationSpecs.nameLike(s));
+                .where(DonationSpecs.markazIdEquals(id))
+                .and(Specification.where(DonationSpecs.nameLike(s)).or(DonationSpecs.uniqueIdLike(s)));
 
-        return repository.findAllByMarkaz(
-                markaz,
+        return repository.findAll(
                 searchSpec,
                 PageRequest.of(
                         page, n,
@@ -88,14 +89,15 @@ public class AdminDonationController {
                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortedStatus,
                                                  @RequestParam(defaultValue = "0") int page,
                                                  @RequestParam(defaultValue = "10") int n) {
-        Santri santri = santriRepository.getById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Santri not Found!"));
+        if(santriRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Santri not Found!");
+        }
 
         Specification<DonationDetail> searchSpec = Specification
-                .where(DonationSpecs.idLike(s)).or(DonationSpecs.nameLike(s));
+                .where(DonationSpecs.santriIdEquals(id))
+                .and(Specification.where(DonationSpecs.nameLike(s)).or(DonationSpecs.uniqueIdLike(s)));
 
-        return repository.findAllBySantri(
-                santri,
+        return repository.findAll(
                 searchSpec,
                 PageRequest.of(
                         page, n,
