@@ -9,6 +9,8 @@ alter table markaz_data
 alter table donation_detail
     add unique_id varchar(30) not null after id;
 
+update donation_detail set unique_id = SUBSTR(MD5(RAND()+id), 1, 10);
+
 create unique index donation_detail_unique_id_uindex
     on donation_detail (unique_id);
 
