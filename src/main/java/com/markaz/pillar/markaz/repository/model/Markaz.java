@@ -1,6 +1,7 @@
 package com.markaz.pillar.markaz.repository.model;
 
 import com.markaz.pillar.donation.repository.model.DonationDetail;
+import com.markaz.pillar.markaz.repository.model.constraint.EmailOrPhone;
 import com.markaz.pillar.santri.repository.model.Santri;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,6 +63,17 @@ public class Markaz {
     @NotBlank
     @Size(max = 2048)
     private String address;
+
+    @NotNull
+    @Size(max = 512)
+    @Column(name = "contact_name")
+    private String contactName;
+
+    @NotNull
+    @Size(max = 512)
+    @Column(name = "contact_info")
+    @EmailOrPhone
+    private String contactInfo;
 
     @NotNull
     @Column(name = "is_active")

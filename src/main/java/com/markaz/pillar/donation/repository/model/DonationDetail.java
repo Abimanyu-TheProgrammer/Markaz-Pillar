@@ -61,9 +61,6 @@ public class DonationDetail {
             "group by u.donation_id), 0)")
     private Long donated;
 
-    @Column(name = "contact_person")
-    private String contactPerson;
-
     @NotNull
     @Column(name = "is_active")
     private boolean isActive = true;
