@@ -33,8 +33,13 @@ public class MarkazSimpleDTO {
     @NotNull
     private String background;
 
+    @NotNull
+    private String contactName;
+
+    @NotNull
+    private String contactInfo;
+
     private Long nominal;
-    private String contactPerson;
 
     public static MarkazSimpleDTO mapFrom(Markaz obj) {
         MarkazSimpleDTOBuilder builder = builder()
@@ -43,11 +48,12 @@ public class MarkazSimpleDTO {
                 .name(obj.getName())
                 .category(obj.getCategory())
                 .background(obj.getBackground())
-                .thumbnailURL(obj.getThumbnailURL());
+                .thumbnailURL(obj.getThumbnailURL())
+                .contactName(obj.getContactName())
+                .contactInfo(obj.getContactInfo());
 
         if(obj.getDonationDetail() != null) {
-            builder.nominal(obj.getDonationDetail().getNominal())
-                    .contactPerson(obj.getDonationDetail().getContactPerson());
+            builder.nominal(obj.getDonationDetail().getNominal());
         }
 
         return builder.build();
