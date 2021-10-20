@@ -34,7 +34,17 @@ public class DonationDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne(targetEntity = Markaz.class)
+    @NotBlank
+    @Column(name = "unique_id")
+    @ToString.Include
+    private String uniqueId;
+
+    @NotBlank
+    @Size(max = 256)
+    @ToString.Include
+    private String name;
+
+    @OneToOne(targetEntity = Markaz.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "markaz_id")
     private Markaz markaz;
 
@@ -44,7 +54,7 @@ public class DonationDetail {
     @Column(name="category")
     private Set<MarkazDonationCategory> categories;
 
-    @OneToOne(targetEntity = Santri.class)
+    @OneToOne(targetEntity = Santri.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "santri_id")
     private Santri santri;
 
@@ -63,7 +73,7 @@ public class DonationDetail {
 
     @NotNull
     @Column(name = "is_active")
-    private boolean isActive = true;
+    private boolean isActive;
 
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)

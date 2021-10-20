@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/admin/markaz")
-@PreAuthorize("isAuthenticated() and hasAuthority('CRUD_MARKAZ') and hasAuthority('CRUD_DONATION')")
+@PreAuthorize("isAuthenticated() and hasAuthority('CRUD_MARKAZ')")
 public class AdminMarkazController {
     private MarkazRepository repository;
     private StaticFileStorage fileStorage;
