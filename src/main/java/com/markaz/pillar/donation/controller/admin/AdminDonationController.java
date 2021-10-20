@@ -27,6 +27,7 @@ import javax.validation.Valid;
 @RequestMapping("/admin/donation")
 @PreAuthorize("isAuthenticated() and hasAuthority('CRUD_DONATION') and hasAnyAuthority('CRUD_MARKAZ', 'CRUD_SANTRI')")
 public class AdminDonationController {
+    public static final String DONATION_NOT_FOUND = "Donation not Found!";
     private DonationRepository repository;
     private MarkazRepository markazRepository;
     private SantriRepository santriRepository;
@@ -56,11 +57,12 @@ public class AdminDonationController {
     public AdminDonationDTO getByUniqueID(@RequestParam String id) {
         return AdminDonationDTO.mapFrom(
                 repository.getByUniqueId(id)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Donation not Found!"))
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, DONATION_NOT_FOUND))
         );
     }
 
     @GetMapping("/markaz")
+    @PreAuthorize("hasAuthority('CRUD_MARKAZ')")
     public Page<AdminDonationDTO> fetchAllMarkaz(@RequestParam(required = false) Integer id,
                                                  @RequestParam(required = false) String s,
                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortedStatus,
@@ -84,6 +86,7 @@ public class AdminDonationController {
     }
 
     @GetMapping("/santri")
+    @PreAuthorize("hasAuthority('CRUD_SANTRI')")
     public Page<AdminDonationDTO> fetchAllSantri(@RequestParam(required = false) Integer id,
                                                  @RequestParam(required = false) String s,
                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortedStatus,
@@ -108,6 +111,7 @@ public class AdminDonationController {
 
     @PostMapping(value = "/markaz", params = {"id"})
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('CRUD_MARKAZ')")
     public AdminDonationDTO createMarkazDonation(@RequestParam int id,
                                                  @RequestBody @Valid MarkazDonationRequestDTO requestDTO) {
         Markaz markaz = markazRepository.getById(id)
@@ -134,6 +138,7 @@ public class AdminDonationController {
 
     @PostMapping(value = "/santri", params = {"id"})
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('CRUD_SANTRI')")
     public AdminDonationDTO createSantriDonation(@RequestParam int id,
                                                  @RequestBody @Valid SantriDonationRequestDTO requestDTO) {
         Santri santri = santriRepository.getById(id)
@@ -158,10 +163,11 @@ public class AdminDonationController {
     }
 
     @PostMapping(value = "/markaz/edit", params = {"id"})
+    @PreAuthorize("hasAuthority('CRUD_MARKAZ')")
     public AdminDonationDTO updateMarkazDonation(@RequestParam String id,
                                                  @RequestBody @Valid MarkazDonationRequestDTO requestDTO) {
         DonationDetail detail = repository.getByUniqueId(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Donation not Found!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, DONATION_NOT_FOUND));
 
         detail.setName(requestDTO.getName());
         detail.setCategories(requestDTO.getCategories());
@@ -173,10 +179,11 @@ public class AdminDonationController {
     }
 
     @PostMapping(value = "/santri/edit", params = {"id"})
+    @PreAuthorize("hasAuthority('CRUD_SANTRI')")
     public AdminDonationDTO updateSantriDonation(@RequestParam String id,
                                                  @RequestBody @Valid SantriDonationRequestDTO requestDTO) {
         DonationDetail detail = repository.getByUniqueId(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Donation not Found!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, DONATION_NOT_FOUND));
 
         detail.setName(requestDTO.getName());
         detail.setDescription(requestDTO.getDescription());
