@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,8 +27,8 @@ import java.util.Set;
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
-@Where(clause = "is_active = 1")
 @SQLDelete(sql = "update donation_detail set is_active = false where id = ?")
+@Check(constraints = "markaz_id is not null or santri_id is not null")
 public class DonationDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,7 @@
 package com.markaz.pillar.markaz.admin.controller.model;
 
 import com.markaz.pillar.markaz.repository.model.MarkazCategory;
+import com.markaz.pillar.markaz.repository.model.constraint.EmailOrPhone;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,4 +28,13 @@ public class MarkazRequestDTO {
     @NotBlank
     @Size(max = 2048)
     private String address;
+
+    @NotBlank
+    @Size(max = 512)
+    private String contactName;
+
+    @NotBlank
+    @Size(max = 512)
+    @EmailOrPhone
+    private String contactInfo;
 }

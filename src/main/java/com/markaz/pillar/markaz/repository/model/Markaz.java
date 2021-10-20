@@ -30,7 +30,6 @@ import java.util.Set;
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
-@Where(clause = "is_active = 1")
 @SQLDelete(sql = "update markaz_data set is_active = false where id = ?")
 public class Markaz {
     @Id
@@ -64,12 +63,12 @@ public class Markaz {
     @Size(max = 2048)
     private String address;
 
-    @NotNull
+    @NotBlank
     @Size(max = 512)
     @Column(name = "contact_name")
     private String contactName;
 
-    @NotNull
+    @NotBlank
     @Size(max = 512)
     @Column(name = "contact_info")
     @EmailOrPhone
@@ -83,5 +82,6 @@ public class Markaz {
     private Set<Santri> santri;
 
     @OneToOne(mappedBy = "markaz", orphanRemoval = true, cascade = CascadeType.ALL)
+    @Where(clause = "is_active = 1")
     private DonationDetail donationDetail;
 }
