@@ -24,8 +24,8 @@ public class SequenceGenerator {
     private static final int NODE_ID_BITS = 10;
     private static final int SEQUENCE_BITS = 12;
 
-    private static final int maxNodeId = (int)(Math.pow(2, NODE_ID_BITS) - 1);
-    private static final int maxSequence = (int)(Math.pow(2, SEQUENCE_BITS) - 1);
+    private static final int MAX_NODE_ID = (int)(Math.pow(2, NODE_ID_BITS) - 1);
+    private static final int MAX_SEQUENCE = (int)(Math.pow(2, SEQUENCE_BITS) - 1);
 
     // Custom Epoch (Date and time (GMT): Thursday, January 9, 2020 12:00:00 AM)
     private static final long CUSTOM_EPOCH = 157852800000L;
@@ -33,12 +33,12 @@ public class SequenceGenerator {
     private final int nodeId;
 
     private volatile long lastTimestamp = -1L;
-    private volatile long sequence = 0L;
+    private volatile long sequence;
 
     // Create SequenceGenerator with a nodeId
     public SequenceGenerator(int nodeId) {
-        if(nodeId < 0 || nodeId > maxNodeId) {
-            throw new IllegalArgumentException(String.format("NodeId must be between %d and %d", 0, maxNodeId));
+        if(nodeId < 0 || nodeId > MAX_NODE_ID) {
+            throw new IllegalArgumentException(String.format("NodeId must be between %d and %d", 0, MAX_NODE_ID));
         }
         this.nodeId = nodeId;
     }
@@ -57,7 +57,7 @@ public class SequenceGenerator {
         }
 
         if (currentTimestamp == lastTimestamp) {
-            sequence = (sequence + 1) & maxSequence;
+            sequence = (sequence + 1) & MAX_SEQUENCE;
             if(sequence == 0) {
                 // Sequence Exhausted, wait till next millisecond.
                 currentTimestamp = waitNextMillis(currentTimestamp);
@@ -70,7 +70,7 @@ public class SequenceGenerator {
         lastTimestamp = currentTimestamp;
 
         long id = currentTimestamp << (NODE_ID_BITS + SEQUENCE_BITS);
-        id |= (nodeId << SEQUENCE_BITS);
+        id |= (long) nodeId << SEQUENCE_BITS;
         id |= sequence;
 
         char[] str = BigInteger.valueOf(id).toString(26).toCharArray();
@@ -112,9 +112,9 @@ public class SequenceGenerator {
             }
             nodeId = sb.toString().hashCode();
         } catch (Exception ex) {
-            nodeId = (new SecureRandom().nextInt());
+            nodeId = new SecureRandom().nextInt();
         }
-        nodeId = nodeId & maxNodeId;
+        nodeId = nodeId & MAX_NODE_ID;
         return nodeId;
     }
 }
