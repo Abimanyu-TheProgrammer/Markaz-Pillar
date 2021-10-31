@@ -65,11 +65,11 @@ public class MarkazDetailDTO {
                 .contactName(obj.getContactName())
                 .contactInfo(obj.getContactInfo());
 
-        if(obj.getDonationDetail() != null) {
-            builder = builder.donationCategories(obj.getDonationDetail().getCategories())
-                    .description(obj.getDonationDetail().getDescription())
-                    .nominal(obj.getDonationDetail().getNominal())
-                    .donated(obj.getDonationDetail().getDonated());
+        if(!obj.getDonationDetails().isEmpty()) {
+            builder = builder.donationCategories(obj.getDonationDetails().get(0).getCategories())
+                    .description(obj.getDonationDetails().get(0).getDescription())
+                    .nominal(obj.getDonationDetails().get(0).getNominal())
+                    .donated(obj.getDonationDetails().get(0).getDonated());
         }
 
         return builder.build();

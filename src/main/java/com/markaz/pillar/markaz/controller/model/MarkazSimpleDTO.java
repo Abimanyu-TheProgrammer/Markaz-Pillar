@@ -52,8 +52,8 @@ public class MarkazSimpleDTO {
                 .contactName(obj.getContactName())
                 .contactInfo(obj.getContactInfo());
 
-        if(obj.getDonationDetail() != null) {
-            builder.nominal(obj.getDonationDetail().getNominal());
+        if(!obj.getDonationDetails().isEmpty()) {
+            builder.nominal(obj.getDonationDetails().get(0).getNominal());
         }
 
         return builder.build();

@@ -15,6 +15,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -80,9 +83,9 @@ public class Markaz {
     private boolean isActive = true;
 
     @OneToMany(mappedBy = "markaz", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<Santri> santri;
+    private Set<Santri> santri = new HashSet<>();
 
-    @OneToOne(mappedBy = "markaz", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "markaz", orphanRemoval = true, cascade = CascadeType.ALL)
     @Where(clause = "is_active = 1")
-    private DonationDetail donationDetail;
+    private List<DonationDetail> donationDetails = new ArrayList<>();
 }

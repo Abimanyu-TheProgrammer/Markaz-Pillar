@@ -36,17 +36,21 @@ public class AdminDonationDTO {
     private LocalDateTime createdAt;
 
     @NotNull
+    private String createdBy;
+
+    @NotNull
     private Boolean isActive;
 
     public static AdminDonationDTO mapFrom(DonationDetail obj) {
         return AdminDonationDTO.builder()
                 .uniqueId(obj.getUniqueId())
                 .name(obj.getName())
-                .categories(obj.getCategories().isEmpty() ? null : obj.getCategories())
+                .categories(obj.getCategories() == null || obj.getCategories().isEmpty() ? null : obj.getCategories())
                 .description(obj.getDescription())
                 .nominal(obj.getNominal())
                 .donated(obj.getDonated())
                 .createdAt(obj.getCreatedAt())
+                .createdBy(obj.getCreatedBy())
                 .isActive(obj.isActive())
                 .build();
     }

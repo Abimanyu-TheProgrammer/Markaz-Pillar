@@ -44,7 +44,7 @@ public class DonationDetail {
     @ToString.Include
     private String name;
 
-    @OneToOne(targetEntity = Markaz.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Markaz.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "markaz_id")
     private Markaz markaz;
 
@@ -54,7 +54,7 @@ public class DonationDetail {
     @Column(name="category")
     private Set<MarkazDonationCategory> categories;
 
-    @OneToOne(targetEntity = Santri.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Santri.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "santri_id")
     private Santri santri;
 

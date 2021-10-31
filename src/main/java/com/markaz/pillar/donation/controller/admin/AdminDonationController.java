@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin/donation")
@@ -63,12 +64,12 @@ public class AdminDonationController {
 
     @GetMapping("/markaz")
     @PreAuthorize("hasAuthority('CRUD_MARKAZ')")
-    public Page<AdminDonationDTO> fetchAllMarkaz(@RequestParam(required = false) Integer id,
+    public Page<AdminDonationDTO> fetchAllMarkaz(@RequestParam Integer id,
                                                  @RequestParam(required = false) String s,
                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortedStatus,
                                                  @RequestParam(defaultValue = "0") int page,
                                                  @RequestParam(defaultValue = "10") int n) {
-        if(markazRepository.existsById(id)) {
+        if(!markazRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Markaz not Found!");
         }
 
@@ -87,12 +88,12 @@ public class AdminDonationController {
 
     @GetMapping("/santri")
     @PreAuthorize("hasAuthority('CRUD_SANTRI')")
-    public Page<AdminDonationDTO> fetchAllSantri(@RequestParam(required = false) Integer id,
+    public Page<AdminDonationDTO> fetchAllSantri(@RequestParam Integer id,
                                                  @RequestParam(required = false) String s,
                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortedStatus,
                                                  @RequestParam(defaultValue = "0") int page,
                                                  @RequestParam(defaultValue = "10") int n) {
-        if(santriRepository.existsById(id)) {
+        if(!santriRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Santri not Found!");
         }
 
@@ -117,7 +118,7 @@ public class AdminDonationController {
         Markaz markaz = markazRepository.getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Markaz not Found!"));
 
-        if(markaz.getDonationDetail() != null) {
+        if(Boolean.TRUE.equals(requestDTO.getIsActive()) && !markaz.getDonationDetails().isEmpty()) {
             throw new IllegalArgumentException("Markaz has existing shown donation!");
         }
 
@@ -130,7 +131,7 @@ public class AdminDonationController {
         detail.setNominal(requestDTO.getNominal());
         detail.setActive(requestDTO.getIsActive());
 
-        markaz.setDonationDetail(detail);
+        markaz.getDonationDetails().add(detail);
         detail.setMarkaz(markaz);
 
         return AdminDonationDTO.mapFrom(repository.save(detail));
@@ -144,7 +145,7 @@ public class AdminDonationController {
         Santri santri = santriRepository.getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Santri not Found!"));
 
-        if(santri.getDonationDetail() != null) {
+        if(Boolean.TRUE.equals(requestDTO.getIsActive()) && !santri.getDonationDetails().isEmpty()) {
             throw new IllegalArgumentException("Santri has existing shown donation!");
         }
 
@@ -156,7 +157,7 @@ public class AdminDonationController {
         detail.setNominal(requestDTO.getNominal());
         detail.setActive(requestDTO.getIsActive());
 
-        santri.setDonationDetail(detail);
+        santri.getDonationDetails().add(detail);
         detail.setSantri(santri);
 
         return AdminDonationDTO.mapFrom(repository.save(detail));
@@ -168,6 +169,14 @@ public class AdminDonationController {
                                                  @RequestBody @Valid MarkazDonationRequestDTO requestDTO) {
         DonationDetail detail = repository.getByUniqueId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, DONATION_NOT_FOUND));
+
+        Markaz markaz = Optional.ofNullable(detail.getMarkaz())
+                .orElseThrow(() -> new IllegalArgumentException("Donation doesn't have Markaz!"));
+        if(!Boolean.valueOf(detail.isActive()).equals(requestDTO.getIsActive())
+                && Boolean.TRUE.equals(requestDTO.getIsActive())
+                && !markaz.getDonationDetails().isEmpty()) {
+            throw new IllegalArgumentException("Markaz has existing shown donation!");
+        }
 
         detail.setName(requestDTO.getName());
         detail.setCategories(requestDTO.getCategories());
@@ -184,6 +193,14 @@ public class AdminDonationController {
                                                  @RequestBody @Valid SantriDonationRequestDTO requestDTO) {
         DonationDetail detail = repository.getByUniqueId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, DONATION_NOT_FOUND));
+
+        Santri santri = Optional.ofNullable(detail.getSantri())
+                .orElseThrow(() -> new IllegalArgumentException("Donation doesn't have Santri!"));
+        if(!Boolean.valueOf(detail.isActive()).equals(requestDTO.getIsActive())
+                && Boolean.TRUE.equals(requestDTO.getIsActive())
+                && !santri.getDonationDetails().isEmpty()) {
+            throw new IllegalArgumentException("Santri has existing shown donation!");
+        }
 
         detail.setName(requestDTO.getName());
         detail.setDescription(requestDTO.getDescription());

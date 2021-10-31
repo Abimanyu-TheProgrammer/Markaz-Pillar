@@ -65,10 +65,10 @@ public class SantriDetailDTO {
                 .birthPlace(obj.getBirthPlace())
                 .birthDate(obj.getBirthDate());
 
-        if(obj.getDonationDetail() != null) {
-            builder = builder.description(obj.getDonationDetail().getDescription())
-                    .nominal(obj.getDonationDetail().getNominal())
-                    .donated(obj.getDonationDetail().getDonated());
+        if(!obj.getDonationDetails().isEmpty()) {
+            builder = builder.description(obj.getDonationDetails().get(0).getDescription())
+                    .nominal(obj.getDonationDetails().get(0).getNominal())
+                    .donated(obj.getDonationDetails().get(0).getDonated());
         }
 
         return builder.build();
