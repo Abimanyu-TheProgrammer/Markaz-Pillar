@@ -88,57 +88,57 @@ coverage:
             cobertura: build/cobertura.xml
     when: on_success
 
-staging:
-    stage: deploy
-    image: ubuntu:latest
-    needs: [test, linter]
-    before_script:
-        # Setup SSH deploy keys
-        - apt-get update -y
-        - 'which ssh-agent || ( apt-get install -y openssh-client )'
-        - 'which rsync || ( apt-get install -y rsync )'
-        - eval $(ssh-agent -s)
-        - ssh-add <(echo "$SSH_STAGING_PRIVATE_KEY" | base64 -d)
-        - mkdir -p ~/.ssh
-        - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    cache:
-        key: $CI_COMMIT_REF_NAME
-        policy: pull
-        paths:
-            - build
-            - .gradle
-    script:
-        - rsync -hvrPt ./build/libs/*.jar deploy-ci@staging.markazpillar.afriza.co:/home/deploy-ci/apps/backend/app.jar
-        - ssh deploy-ci@staging.markazpillar.afriza.co "sudo systemctl restart backend.service && sudo systemctl restart nginx.service"
-    when: on_success
-    only:
-        - master
-
-production:
-    stage: deploy
-    image: ubuntu:latest
-    needs: [test, linter]
-    before_script:
-        # Setup SSH deploy keys
-        - apt-get update -y
-        - 'which ssh-agent || ( apt-get install -y openssh-client )'
-        - 'which rsync || ( apt-get install -y rsync )'
-        - eval $(ssh-agent -s)
-        - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
-        - mkdir -p ~/.ssh
-        - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    cache:
-        key: $CI_COMMIT_REF_NAME
-        policy: pull
-        paths:
-            - build
-            - .gradle
-    script:
-        - rsync -hvrPt ./build/libs/*.jar deploy-ci@markazpillar.afriza.co:/home/deploy-ci/apps/backend/app.jar
-        - ssh deploy-ci@markazpillar.afriza.co "sudo systemctl restart backend.service && sudo systemctl restart nginx.service"
-    when: on_success
-    only:
-        - production
+#staging:
+#    stage: deploy
+#    image: ubuntu:latest
+#    needs: [test, linter]
+#    before_script:
+#        # Setup SSH deploy keys
+#        - apt-get update -y
+#        - 'which ssh-agent || ( apt-get install -y openssh-client )'
+#        - 'which rsync || ( apt-get install -y rsync )'
+#        - eval $(ssh-agent -s)
+#        - ssh-add <(echo "$SSH_STAGING_PRIVATE_KEY" | base64 -d)
+#        - mkdir -p ~/.ssh
+#        - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+#    cache:
+#        key: $CI_COMMIT_REF_NAME
+#        policy: pull
+#        paths:
+#            - build
+#            - .gradle
+#    script:
+#        - rsync -hvrPt ./build/libs/*.jar deploy-ci@staging.markazpillar.afriza.co:/home/deploy-ci/apps/backend/app.jar
+#        - ssh deploy-ci@staging.markazpillar.afriza.co "sudo systemctl restart backend.service && sudo systemctl restart nginx.service"
+#    when: on_success
+#    only:
+#        - master
+#
+#production:
+#    stage: deploy
+#    image: ubuntu:latest
+#    needs: [test, linter]
+#    before_script:
+#        # Setup SSH deploy keys
+#        - apt-get update -y
+#        - 'which ssh-agent || ( apt-get install -y openssh-client )'
+#        - 'which rsync || ( apt-get install -y rsync )'
+#        - eval $(ssh-agent -s)
+#        - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
+#        - mkdir -p ~/.ssh
+#        - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+#    cache:
+#        key: $CI_COMMIT_REF_NAME
+#        policy: pull
+#        paths:
+#            - build
+#            - .gradle
+#    script:
+#        - rsync -hvrPt ./build/libs/*.jar deploy-ci@markazpillar.afriza.co:/home/deploy-ci/apps/backend/app.jar
+#        - ssh deploy-ci@markazpillar.afriza.co "sudo systemctl restart backend.service && sudo systemctl restart nginx.service"
+#    when: on_success
+#    only:
+#        - production
 
 sonarCheck:
     stage: deploy
