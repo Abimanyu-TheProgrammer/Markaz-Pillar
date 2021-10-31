@@ -60,7 +60,7 @@ public class UserDonation {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private DonationStatus status;
+    private DonationStatus status = DonationStatus.MENUNGGU_KONFIRMASI;
 
     private String reason;
 

@@ -2,8 +2,6 @@ package com.markaz.pillar.santri.admin.controller;
 
 import com.github.slugify.Slugify;
 import com.markaz.pillar.config.controller.model.annotation.ResponseMessage;
-import com.markaz.pillar.donation.admin.controller.model.SantriDonationRequestDTO;
-import com.markaz.pillar.donation.repository.model.DonationDetail;
 import com.markaz.pillar.markaz.repository.MarkazRepository;
 import com.markaz.pillar.markaz.repository.model.Markaz;
 import com.markaz.pillar.santri.admin.controller.markaz.SantriRequestDTO;
@@ -51,8 +49,7 @@ public class AdminSantriController {
     @ResponseMessage("Santri is created!")
     public SantriDetailDTO create(@RequestParam(name = "markaz_id") int markazId,
                                   @RequestPart MultipartFile thumbnail,
-                                  @RequestPart @Valid SantriRequestDTO santri,
-                                  @RequestPart(required = false) @Valid SantriDonationRequestDTO donation)
+                                  @RequestPart @Valid SantriRequestDTO santri)
             throws IOException {
         Markaz markaz = markazRepository.getById(markazId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz not found"));
@@ -75,15 +72,6 @@ public class AdminSantriController {
 
         markaz.getSantri().add(entity);
         entity.setMarkaz(markaz);
-
-        if(donation != null) {
-            DonationDetail donationDetail = new DonationDetail();
-            donationDetail.setSantri(entity);
-            donationDetail.setDescription(donation.getDescription());
-            donationDetail.setNominal(donation.getNominal());
-
-            entity.setDonationDetail(donationDetail);
-        }
 
         return SantriDetailDTO.mapFrom(repository.save(entity));
     }

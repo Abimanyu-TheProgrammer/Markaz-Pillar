@@ -1,6 +1,7 @@
 package com.markaz.pillar.markaz.repository.model;
 
 import com.markaz.pillar.donation.repository.model.DonationDetail;
+import com.markaz.pillar.markaz.repository.model.constraint.EmailOrPhone;
 import com.markaz.pillar.santri.repository.model.Santri;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -63,13 +67,25 @@ public class Markaz {
     @Size(max = 2048)
     private String address;
 
+    @NotBlank
+    @Size(max = 512)
+    @Column(name = "contact_name")
+    private String contactName;
+
+    @NotBlank
+    @Size(max = 512)
+    @Column(name = "contact_info")
+    @EmailOrPhone
+    private String contactInfo;
+
     @NotNull
     @Column(name = "is_active")
     private boolean isActive = true;
 
     @OneToMany(mappedBy = "markaz", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<Santri> santri;
+    private Set<Santri> santri = new HashSet<>();
 
-    @OneToOne(mappedBy = "markaz", orphanRemoval = true, cascade = CascadeType.ALL)
-    private DonationDetail donationDetail;
+    @OneToMany(mappedBy = "markaz", orphanRemoval = true, cascade = CascadeType.ALL)
+    @Where(clause = "is_active = 1")
+    private List<DonationDetail> donationDetails = new ArrayList<>();
 }

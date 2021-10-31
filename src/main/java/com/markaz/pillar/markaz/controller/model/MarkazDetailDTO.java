@@ -43,10 +43,15 @@ public class MarkazDetailDTO {
     @NotEmpty
     private Set<MarkazDonationCategory> donationCategories;
 
+    @NotNull
+    private String contactName;
+
+    @NotNull
+    private String contactInfo;
+
     private String description;
     private Long nominal;
     private Long donated;
-    private String contactPerson;
 
     public static MarkazDetailDTO mapFrom(Markaz obj) {
         MarkazDetailDTOBuilder builder = builder()
@@ -56,14 +61,15 @@ public class MarkazDetailDTO {
                 .category(obj.getCategory())
                 .background(obj.getBackground())
                 .thumbnailURL(obj.getThumbnailURL())
-                .address(obj.getAddress());
+                .address(obj.getAddress())
+                .contactName(obj.getContactName())
+                .contactInfo(obj.getContactInfo());
 
-        if(obj.getDonationDetail() != null) {
-            builder = builder.donationCategories(obj.getDonationDetail().getCategories())
-                    .description(obj.getDonationDetail().getDescription())
-                    .nominal(obj.getDonationDetail().getNominal())
-                    .donated(obj.getDonationDetail().getDonated())
-                    .contactPerson(obj.getDonationDetail().getContactPerson());
+        if(!obj.getDonationDetails().isEmpty()) {
+            builder = builder.donationCategories(obj.getDonationDetails().get(0).getCategories())
+                    .description(obj.getDonationDetails().get(0).getDescription())
+                    .nominal(obj.getDonationDetails().get(0).getNominal())
+                    .donated(obj.getDonationDetails().get(0).getDonated());
         }
 
         return builder.build();

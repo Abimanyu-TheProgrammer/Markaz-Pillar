@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,14 +27,24 @@ import java.util.Set;
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
-@Where(clause = "is_active = 1")
 @SQLDelete(sql = "update donation_detail set is_active = false where id = ?")
+@Check(constraints = "markaz_id is not null or santri_id is not null")
 public class DonationDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne(targetEntity = Markaz.class)
+    @NotBlank
+    @Column(name = "unique_id")
+    @ToString.Include
+    private String uniqueId;
+
+    @NotBlank
+    @Size(max = 256)
+    @ToString.Include
+    private String name;
+
+    @ManyToOne(targetEntity = Markaz.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "markaz_id")
     private Markaz markaz;
 
@@ -44,7 +54,7 @@ public class DonationDetail {
     @Column(name="category")
     private Set<MarkazDonationCategory> categories;
 
-    @OneToOne(targetEntity = Santri.class)
+    @ManyToOne(targetEntity = Santri.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "santri_id")
     private Santri santri;
 
@@ -61,12 +71,9 @@ public class DonationDetail {
             "group by u.donation_id), 0)")
     private Long donated;
 
-    @Column(name = "contact_person")
-    private String contactPerson;
-
     @NotNull
     @Column(name = "is_active")
-    private boolean isActive = true;
+    private boolean isActive;
 
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)

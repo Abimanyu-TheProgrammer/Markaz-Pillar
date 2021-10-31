@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface MarkazRepository extends JpaRepository<Markaz, Integer>, JpaSpecificationExecutor<Markaz> {
     boolean existsByName(String name);
+
     Optional<Markaz> getBySlug(String slug);
     Optional<Markaz> getById(int id);
 }

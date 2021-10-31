@@ -2,8 +2,6 @@ package com.markaz.pillar.markaz.admin.controller;
 
 import com.github.slugify.Slugify;
 import com.markaz.pillar.config.controller.model.annotation.ResponseMessage;
-import com.markaz.pillar.donation.admin.controller.model.MarkazDonationRequestDTO;
-import com.markaz.pillar.donation.repository.model.DonationDetail;
 import com.markaz.pillar.markaz.admin.controller.model.MarkazRequestDTO;
 import com.markaz.pillar.markaz.controller.model.MarkazDetailDTO;
 import com.markaz.pillar.markaz.repository.MarkazRepository;
@@ -23,7 +21,7 @@ import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/admin/markaz")
-@PreAuthorize("isAuthenticated() and hasAuthority('CRUD_MARKAZ') and hasAuthority('CRUD_DONATION')")
+@PreAuthorize("isAuthenticated() and hasAuthority('CRUD_MARKAZ')")
 public class AdminMarkazController {
     private MarkazRepository repository;
     private StaticFileStorage fileStorage;
@@ -42,8 +40,7 @@ public class AdminMarkazController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseMessage("Markaz is created!")
     public MarkazDetailDTO create(@RequestPart MultipartFile thumbnail,
-                                  @RequestPart @Valid MarkazRequestDTO markaz,
-                                  @RequestPart(required = false) @Valid MarkazDonationRequestDTO donation)
+                                  @RequestPart @Valid MarkazRequestDTO markaz)
             throws IOException {
         if(repository.existsByName(markaz.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz with the same name exists");
@@ -59,17 +56,8 @@ public class AdminMarkazController {
         entity.setThumbnailURL(thumbnailURL);
         entity.setCategory(markaz.getCategory());
         entity.setAddress(markaz.getAddress());
-
-        if(donation != null) {
-            DonationDetail donationDetail = new DonationDetail();
-            donationDetail.setMarkaz(entity);
-            donationDetail.setCategories(donation.getCategories());
-            donationDetail.setDescription(donation.getDescription());
-            donationDetail.setNominal(donation.getNominal());
-            donationDetail.setContactPerson(donation.getContactPerson());
-
-            entity.setDonationDetail(donationDetail);
-        }
+        entity.setContactName(markaz.getContactName());
+        entity.setContactInfo(markaz.getContactInfo());
 
         return MarkazDetailDTO.mapFrom(repository.save(entity));
     }
@@ -95,6 +83,8 @@ public class AdminMarkazController {
         entity.setCategory(markaz.getCategory());
         entity.setAddress(markaz.getAddress());
         entity.setSlug(new Slugify().slugify(markaz.getName()));
+        entity.setContactName(markaz.getContactName());
+        entity.setContactInfo(markaz.getContactInfo());
 
         if(thumbnail != null) {
             String thumbnailURL = fileStorage.saveFile(thumbnail, Paths.get("markaz", "thumbnail"));

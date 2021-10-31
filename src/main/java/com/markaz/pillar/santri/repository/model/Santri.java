@@ -15,6 +15,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -81,6 +83,7 @@ public class Santri {
     @Column(name = "is_active")
     private boolean isActive = true;
 
-    @OneToOne(mappedBy = "santri", orphanRemoval = true, cascade = CascadeType.ALL)
-    private DonationDetail donationDetail;
+    @OneToMany(mappedBy = "santri", orphanRemoval = true, cascade = CascadeType.ALL)
+    @Where(clause = "is_active = 1")
+    private List<DonationDetail> donationDetails = new ArrayList<>();
 }
