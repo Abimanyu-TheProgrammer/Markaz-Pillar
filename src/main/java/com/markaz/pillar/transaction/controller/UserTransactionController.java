@@ -78,20 +78,7 @@ public class UserTransactionController {
              throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't have existing donation!");
         }
 
-        DonationDetail donationDetail = markaz.getDonationDetails().get(0);
-        AuthUser user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is Unauthorized!"));
-
-        String paymentURL = fileStorage.saveFile(payment, Paths.get(String.valueOf(user.getId())));
-
-        UserTransaction transaction = new UserTransaction();
-        transaction.setTrxId(sequenceGenerator.nextId());
-        transaction.setDonationDetail(donationDetail);
-        transaction.setUser(user);
-        transaction.setDonationURL(paymentURL);
-        transaction.setAmount(requestDTO.getAmount());
-
-        return TransactionDTO.mapFrom(repository.save(transaction));
+        return createTransaction(payment, requestDTO, principal, markaz.getDonationDetails().get(0));
     }
 
     @PostMapping("/santri")
@@ -99,12 +86,18 @@ public class UserTransactionController {
                                             @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
                                             Principal principal) throws IOException {
         Santri santri = santriRepository.getById(requestDTO.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri doesn't exist!"));
         if(santri.getDonationDetails().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't have existing donation!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri doesn't have existing donation!");
         }
 
-        DonationDetail donationDetail = santri.getDonationDetails().get(0);
+        return createTransaction(payment, requestDTO, principal, santri.getDonationDetails().get(0));
+    }
+
+    private TransactionDTO createTransaction(@RequestPart MultipartFile payment,
+                                             @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
+                                             Principal principal,
+                                             DonationDetail donationDetail) throws IOException {
         AuthUser user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is Unauthorized!"));
 
