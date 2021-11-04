@@ -5,6 +5,8 @@ import com.markaz.pillar.auth.repository.models.AuthUser;
 import com.markaz.pillar.donation.repository.model.DonationDetail;
 import com.markaz.pillar.markaz.repository.MarkazRepository;
 import com.markaz.pillar.markaz.repository.model.Markaz;
+import com.markaz.pillar.santri.repository.SantriRepository;
+import com.markaz.pillar.santri.repository.model.Santri;
 import com.markaz.pillar.tools.file.impl.RollingFileStorage;
 import com.markaz.pillar.tools.sequence.SequenceGenerator;
 import com.markaz.pillar.transaction.controller.model.TransactionDTO;
@@ -31,9 +33,15 @@ import java.security.Principal;
 public class UserTransactionController {
     private UserTransactionRepository repository;
     private MarkazRepository markazRepository;
+    private SantriRepository santriRepository;
     private UserRepository userRepository;
     private SequenceGenerator sequenceGenerator;
     private RollingFileStorage fileStorage;
+
+    @Autowired
+    public void setSantriRepository(SantriRepository santriRepository) {
+        this.santriRepository = santriRepository;
+    }
 
     @Autowired
     public void setFileStorage(RollingFileStorage fileStorage) {
@@ -60,10 +68,10 @@ public class UserTransactionController {
         this.repository = repository;
     }
 
-    @PostMapping
-    public TransactionDTO createTransaction(@RequestPart MultipartFile payment,
-                                            @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
-                                            Principal principal) throws IOException {
+    @PostMapping("/markaz")
+    public TransactionDTO createTransactionMarkaz(@RequestPart MultipartFile payment,
+                                                  @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
+                                                  Principal principal) throws IOException {
         Markaz markaz = markazRepository.getById(requestDTO.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));
         if(markaz.getDonationDetails().isEmpty()) {
@@ -71,6 +79,32 @@ public class UserTransactionController {
         }
 
         DonationDetail donationDetail = markaz.getDonationDetails().get(0);
+        AuthUser user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is Unauthorized!"));
+
+        String paymentURL = fileStorage.saveFile(payment, Paths.get(String.valueOf(user.getId())));
+
+        UserTransaction transaction = new UserTransaction();
+        transaction.setTrxId(sequenceGenerator.nextId());
+        transaction.setDonationDetail(donationDetail);
+        transaction.setUser(user);
+        transaction.setDonationURL(paymentURL);
+        transaction.setAmount(requestDTO.getAmount());
+
+        return TransactionDTO.mapFrom(repository.save(transaction));
+    }
+
+    @PostMapping("/santri")
+    public TransactionDTO createTransaction(@RequestPart MultipartFile payment,
+                                            @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
+                                            Principal principal) throws IOException {
+        Santri santri = santriRepository.getById(requestDTO.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));
+        if(santri.getDonationDetails().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't have existing donation!");
+        }
+
+        DonationDetail donationDetail = santri.getDonationDetails().get(0);
         AuthUser user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is Unauthorized!"));
 
