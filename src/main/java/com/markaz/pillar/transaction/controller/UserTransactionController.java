@@ -26,7 +26,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/transaction")
@@ -70,24 +69,26 @@ public class UserTransactionController {
     }
 
     @PostMapping
-    public TransactionDTO createTransactionMarkaz(@RequestPart MultipartFile payment,
-                                                  @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
-                                                  Principal principal) throws IOException {
-        Optional<Markaz> markaz = markazRepository.getById(requestDTO.getMarkaz());
-        Optional<Santri> santri = santriRepository.getById(requestDTO.getSantri());
+    public TransactionDTO createTransaction(@RequestPart MultipartFile payment,
+                                            @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
+                                            Principal principal) throws IOException {
         DonationDetail donationDetail;
-        if(!markaz.isPresent() && santri.isPresent()) {
-            if(santri.get().getDonationDetails().isEmpty()) {
+        if(requestDTO.getMarkaz() == null && requestDTO.getSantri() != null) {
+            Santri santri = santriRepository.getById(requestDTO.getSantri())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri doesn't exist!"));
+            if(santri.getDonationDetails().isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri doesn't have existing donation!");
             }
 
-            donationDetail = santri.get().getDonationDetails().get(0);
-        } else if(markaz.isPresent() && !santri.isPresent()) {
-            if(markaz.get().getDonationDetails().isEmpty()) {
+            donationDetail = santri.getDonationDetails().get(0);
+        } else if(requestDTO.getMarkaz() != null && requestDTO.getSantri() == null) {
+            Markaz markaz = markazRepository.getById(requestDTO.getMarkaz())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));;
+            if(markaz.getDonationDetails().isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't have existing donation!");
             }
 
-            donationDetail = markaz.get().getDonationDetails().get(0);
+            donationDetail = markaz.getDonationDetails().get(0);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid use of API");
         }

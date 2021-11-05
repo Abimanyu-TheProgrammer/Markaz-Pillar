@@ -10,11 +10,9 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @ToString(onlyExplicitlyIncluded = true)
 public class TransactionRequestDTO {
-    @NotNull
     @ToString.Include
     private Integer markaz;
 
-    @NotNull
     @ToString.Include
     private Integer santri;
 
