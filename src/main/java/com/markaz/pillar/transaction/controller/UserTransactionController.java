@@ -75,7 +75,7 @@ public class UserTransactionController {
         Markaz markaz = markazRepository.getById(requestDTO.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));
         if(markaz.getDonationDetails().isEmpty()) {
-             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't have existing donation!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't have existing donation!");
         }
 
         return createTransaction(payment, requestDTO, principal, markaz.getDonationDetails().get(0));
