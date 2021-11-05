@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/transaction")
@@ -68,36 +69,29 @@ public class UserTransactionController {
         this.repository = repository;
     }
 
-    @PostMapping("/markaz")
+    @PostMapping
     public TransactionDTO createTransactionMarkaz(@RequestPart MultipartFile payment,
                                                   @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
                                                   Principal principal) throws IOException {
-        Markaz markaz = markazRepository.getById(requestDTO.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));
-        if(markaz.getDonationDetails().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't have existing donation!");
+        Optional<Markaz> markaz = markazRepository.getById(requestDTO.getMarkaz());
+        Optional<Santri> santri = santriRepository.getById(requestDTO.getSantri());
+        DonationDetail donationDetail;
+        if(!markaz.isPresent() && santri.isPresent()) {
+            if(santri.get().getDonationDetails().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri doesn't have existing donation!");
+            }
+
+            donationDetail = santri.get().getDonationDetails().get(0);
+        } else if(markaz.isPresent() && !santri.isPresent()) {
+            if(markaz.get().getDonationDetails().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't have existing donation!");
+            }
+
+            donationDetail = markaz.get().getDonationDetails().get(0);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid use of API");
         }
 
-        return createTransaction(payment, requestDTO, principal, markaz.getDonationDetails().get(0));
-    }
-
-    @PostMapping("/santri")
-    public TransactionDTO createTransaction(@RequestPart MultipartFile payment,
-                                            @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
-                                            Principal principal) throws IOException {
-        Santri santri = santriRepository.getById(requestDTO.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri doesn't exist!"));
-        if(santri.getDonationDetails().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri doesn't have existing donation!");
-        }
-
-        return createTransaction(payment, requestDTO, principal, santri.getDonationDetails().get(0));
-    }
-
-    private TransactionDTO createTransaction(@RequestPart MultipartFile payment,
-                                             @RequestPart(name = "detail") @Valid TransactionRequestDTO requestDTO,
-                                             Principal principal,
-                                             DonationDetail donationDetail) throws IOException {
         AuthUser user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is Unauthorized!"));
 

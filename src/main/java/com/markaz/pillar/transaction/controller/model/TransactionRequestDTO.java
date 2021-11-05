@@ -12,7 +12,11 @@ import javax.validation.constraints.NotNull;
 public class TransactionRequestDTO {
     @NotNull
     @ToString.Include
-    private Integer id;
+    private Integer markaz;
+
+    @NotNull
+    @ToString.Include
+    private Integer santri;
 
     @NotNull
     private Long amount;
