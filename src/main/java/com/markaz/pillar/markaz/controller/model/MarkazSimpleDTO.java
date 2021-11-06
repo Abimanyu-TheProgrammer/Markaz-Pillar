@@ -39,8 +39,6 @@ public class MarkazSimpleDTO {
     @NotNull
     private String contactInfo;
 
-    private Long nominal;
-
     public static MarkazSimpleDTO mapFrom(Markaz obj) {
         MarkazSimpleDTOBuilder builder = builder()
                 .id(obj.getId())
@@ -51,10 +49,6 @@ public class MarkazSimpleDTO {
                 .thumbnailURL(obj.getThumbnailURL())
                 .contactName(obj.getContactName())
                 .contactInfo(obj.getContactInfo());
-
-        if(!obj.getDonationDetails().isEmpty()) {
-            builder.nominal(obj.getDonationDetails().get(0).getNominal());
-        }
 
         return builder.build();
     }

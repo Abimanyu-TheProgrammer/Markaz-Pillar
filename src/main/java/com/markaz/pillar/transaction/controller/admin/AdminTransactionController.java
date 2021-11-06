@@ -1,9 +1,7 @@
 package com.markaz.pillar.transaction.controller.admin;
 
-import com.markaz.pillar.markaz.repository.MarkazRepository;
-import com.markaz.pillar.markaz.repository.model.Markaz;
-import com.markaz.pillar.santri.repository.SantriRepository;
-import com.markaz.pillar.santri.repository.model.Santri;
+import com.markaz.pillar.donation.repository.DonationRepository;
+import com.markaz.pillar.donation.repository.model.DonationDetail;
 import com.markaz.pillar.transaction.controller.admin.model.EditStatusRequestDTO;
 import com.markaz.pillar.transaction.controller.model.TransactionDTO;
 import com.markaz.pillar.transaction.repository.UserTransactionRepository;
@@ -24,17 +22,11 @@ import javax.validation.Valid;
 @PreAuthorize("isAuthenticated() and hasAuthority('CRUD_DONATION')")
 public class AdminTransactionController {
     private UserTransactionRepository repository;
-    private MarkazRepository markazRepository;
-    private SantriRepository santriRepository;
+    private DonationRepository donationRepository;
 
     @Autowired
-    public void setMarkazRepository(MarkazRepository markazRepository) {
-        this.markazRepository = markazRepository;
-    }
-
-    @Autowired
-    public void setSantriRepository(SantriRepository santriRepository) {
-        this.santriRepository = santriRepository;
+    public void setDonationRepository(DonationRepository donationRepository) {
+        this.donationRepository = donationRepository;
     }
 
     @Autowired
@@ -62,25 +54,14 @@ public class AdminTransactionController {
         return TransactionDTO.mapFrom(repository.save(transaction));
     }
 
-    @GetMapping(params = {"markaz"})
-    public Page<TransactionDTO> fetchTransactionsByMarkaz(@RequestParam(name = "markaz") int id,
+    @GetMapping(params = {"id"})
+    public Page<TransactionDTO> fetchTransactionsByMarkaz(@RequestParam String id,
                                                           @RequestParam(defaultValue = "0") int page,
                                                           @RequestParam(defaultValue = "10") int n) {
-        Markaz markaz = markazRepository.getById(id)
+        DonationDetail donationDetail = donationRepository.getByUniqueId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));
 
-        return repository.findAllByDonationDetail_Markaz(markaz, PageRequest.of(page, n))
-                .map(TransactionDTO::mapFrom);
-    }
-
-    @GetMapping(params = {"santri"})
-    public Page<TransactionDTO> fetchTransactionsBySantri(@RequestParam(name = "santri") int id,
-                                                          @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "10") int n) {
-        Santri santri = santriRepository.getById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri doesn't exist!"));
-
-        return repository.findAllByDonationDetail_Santri(santri, PageRequest.of(page, n))
+        return repository.findAllByDonationDetail(donationDetail, PageRequest.of(page, n))
                 .map(TransactionDTO::mapFrom);
     }
 }
