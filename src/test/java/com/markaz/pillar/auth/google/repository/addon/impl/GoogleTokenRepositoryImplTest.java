@@ -74,7 +74,7 @@ class GoogleTokenRepositoryImplTest {
         GoogleToken oldToken = new GoogleToken();
         oldToken.setRefreshToken("test");
 
-        Mockito.when(repository.findFirstByAccount_IdOrderByCreatedAtDesc(1))
+        Mockito.when(repository.findFirstByAccountIdOrderByCreatedAtDesc(1))
                 .thenReturn(oldToken);
 
         AuthUser user = Mockito.mock(AuthUser.class);

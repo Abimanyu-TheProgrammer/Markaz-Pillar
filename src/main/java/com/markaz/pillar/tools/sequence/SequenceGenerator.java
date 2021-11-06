@@ -19,8 +19,6 @@ import java.util.Enumeration;
  */
 @Service
 public class SequenceGenerator {
-    private static final int UNUSED_BITS = 1; // Sign bit, Unused (always set to 0)
-    private static final int EPOCH_BITS = 41;
     private static final int NODE_ID_BITS = 10;
     private static final int SEQUENCE_BITS = 12;
 
@@ -97,7 +95,7 @@ public class SequenceGenerator {
     }
 
     private int createNodeId() {
-        int nodeId;
+        int id;
         try {
             StringBuilder sb = new StringBuilder();
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -110,11 +108,11 @@ public class SequenceGenerator {
                     }
                 }
             }
-            nodeId = sb.toString().hashCode();
+            id = sb.toString().hashCode();
         } catch (Exception ex) {
-            nodeId = new SecureRandom().nextInt();
+            id = new SecureRandom().nextInt();
         }
-        nodeId = nodeId & MAX_NODE_ID;
-        return nodeId;
+        id = id & MAX_NODE_ID;
+        return id;
     }
 }

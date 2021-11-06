@@ -2,6 +2,7 @@ package com.markaz.pillar.tools.file;
 
 import com.github.slugify.Slugify;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,6 +14,18 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class FileStorageService {
+    @Value("${service.storage.root}")
+    protected String rootDir;
+
+    @Value("${service.storage.static.dir}")
+    protected String directory;
+
+    @Value("${service.storage.url}")
+    protected String rootUrl;
+
+    @Value("#{'${service.storage.allowed-content-types}'.split(',')}")
+    protected List<String> allowedContentTypes;
+
     private final Slugify slugify;
 
     protected FileStorageService() {

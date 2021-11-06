@@ -1,13 +1,12 @@
 package com.markaz.pillar.auth.jwt.service;
 
 import com.markaz.pillar.auth.jwt.config.JwtTokenUtil;
-import com.markaz.pillar.auth.jwt.controller.exception.InvalidCredentialsException;
-import com.markaz.pillar.auth.jwt.controller.exception.UserDisabledException;
 import com.markaz.pillar.auth.jwt.controller.model.JwtResponse;
 import com.markaz.pillar.auth.jwt.repository.TokenRepository;
 import com.markaz.pillar.auth.jwt.repository.model.AuthRefresh;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -16,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -74,16 +74,27 @@ public class AuthenticationService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
         } catch (DisabledException e) {
-            throw new UserDisabledException(email, e);
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    String.format("User %s is disabled", email),
+                    e
+            );
         } catch (BadCredentialsException e) {
-            throw new InvalidCredentialsException(email, e);
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    String.format("Invalid credentials for %s", email),
+                    e
+            );
         }
     }
 
     public void authenticate(String email) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         if(!userDetails.isEnabled()) {
-            throw new UserDisabledException(userDetails.getUsername());
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    String.format("User %s is disabled", email)
+            );
         }
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(

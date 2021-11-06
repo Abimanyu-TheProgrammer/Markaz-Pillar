@@ -40,7 +40,7 @@ public class RegistrationRequestDTO {
     @Size(max = 512)
     @ValidPassword
     private String password;
-    
+
     public AuthUser mapTo() {
         AuthUser obj = new AuthUser();
         obj.setEmail(this.getEmail());

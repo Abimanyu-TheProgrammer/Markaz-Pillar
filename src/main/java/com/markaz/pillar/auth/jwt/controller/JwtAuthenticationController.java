@@ -1,9 +1,8 @@
 package com.markaz.pillar.auth.jwt.controller;
 
 
+import com.google.gson.Gson;
 import com.markaz.pillar.auth.jwt.config.JwtTokenUtil;
-import com.markaz.pillar.auth.jwt.controller.exception.InvalidAuthorizationException;
-import com.markaz.pillar.auth.jwt.controller.exception.UserDisabledException;
 import com.markaz.pillar.auth.jwt.controller.model.JwtRequest;
 import com.markaz.pillar.auth.jwt.controller.model.JwtResponse;
 import com.markaz.pillar.auth.jwt.controller.model.RefreshRequest;
@@ -78,9 +77,15 @@ public class JwtAuthenticationController {
         String email = jwtTokenUtil.getEmailFromToken(request.getToken());
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         if(!userDetails.isEnabled()) {
-            throw new UserDisabledException(email);
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    String.format("User %s is disabled", email)
+            );
         } else if(!userDetails.getAuthorities().containsAll(claimAuthorities)) {
-            throw new InvalidAuthorizationException(email, claimAuthorities);
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    String.format("%s is not authorized for %s", email, new Gson().toJson(claimAuthorities))
+            );
         }
 
         return "OK";

@@ -10,6 +10,7 @@ import java.util.Arrays;
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
     @Override
     public void initialize(ValidPassword arg0) {
+//        Unneeded
     }
 
     @Override

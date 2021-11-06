@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface SantriRepository extends JpaRepository<Santri, Integer>, JpaSpecificationExecutor<Santri> {
-    boolean existsByNameAndMarkaz_Id(String name, int markazId);
+    boolean existsByNameAndMarkazId(String name, int markazId);
 
     Optional<Santri> getBySlug(String slug);
     Optional<Santri> getById(int id);
