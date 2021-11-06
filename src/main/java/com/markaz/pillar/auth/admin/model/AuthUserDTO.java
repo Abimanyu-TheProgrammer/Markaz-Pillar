@@ -56,6 +56,7 @@ public class AuthUserDTO {
                                 .map(Menu::getName)
                                 .collect(Collectors.toSet())
                 )
+                .fullName(obj.getFullName())
                 .phoneNum(obj.getPhoneNum())
                 .address(obj.getAddress())
                 .profileURL(obj.getProfileURL())
