@@ -83,7 +83,7 @@ public class UserTransactionController {
             donationDetail = santri.getDonationDetails().get(0);
         } else if(requestDTO.getMarkaz() != null && requestDTO.getSantri() == null) {
             Markaz markaz = markazRepository.getById(requestDTO.getMarkaz())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));;
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));
             if(markaz.getDonationDetails().isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't have existing donation!");
             }
