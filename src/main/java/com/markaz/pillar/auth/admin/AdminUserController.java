@@ -7,7 +7,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -28,10 +31,10 @@ public class AdminUserController {
                 .map(AuthUserDTO::mapFrom);
     }
 
-    @GetMapping("/{email}")
-    public AuthUserDTO getUser(@PathVariable String email)  {
+    @GetMapping(params = "username")
+    public AuthUserDTO getUser(@RequestParam String username)  {
         return AuthUserDTO.mapFrom(
-                userRepository.findByEmail(email)
+                userRepository.findByUsername(username)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found!"))
         );
     }
