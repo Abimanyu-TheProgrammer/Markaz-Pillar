@@ -63,7 +63,7 @@ public class AdminDonationController {
     }
 
     @GetMapping("/markaz")
-    @PreAuthorize("hasAuthority('CRUD_MARKAZ')")
+    @PreAuthorize("isAuthenticated() and hasAuthority('CRUD_MARKAZ')")
     public Page<AdminDonationDTO> fetchAllMarkaz(@RequestParam Integer id,
                                                  @RequestParam(required = false) String s,
                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortedStatus,
@@ -87,7 +87,7 @@ public class AdminDonationController {
     }
 
     @GetMapping("/santri")
-    @PreAuthorize("hasAuthority('CRUD_SANTRI')")
+    @PreAuthorize("isAuthenticated() and hasAuthority('CRUD_SANTRI')")
     public Page<AdminDonationDTO> fetchAllSantri(@RequestParam Integer id,
                                                  @RequestParam(required = false) String s,
                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortedStatus,
@@ -112,7 +112,7 @@ public class AdminDonationController {
 
     @PostMapping(value = "/markaz", params = {"id"})
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('CRUD_MARKAZ')")
+    @PreAuthorize("isAuthenticated() and hasAuthority('CRUD_MARKAZ')")
     public AdminDonationDTO createMarkazDonation(@RequestParam int id,
                                                  @RequestBody @Valid MarkazDonationRequestDTO requestDTO) {
         Markaz markaz = markazRepository.getById(id)
@@ -139,7 +139,7 @@ public class AdminDonationController {
 
     @PostMapping(value = "/santri", params = {"id"})
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('CRUD_SANTRI')")
+    @PreAuthorize("isAuthenticated() and hasAuthority('CRUD_SANTRI')")
     public AdminDonationDTO createSantriDonation(@RequestParam int id,
                                                  @RequestBody @Valid SantriDonationRequestDTO requestDTO) {
         Santri santri = santriRepository.getById(id)
@@ -164,7 +164,7 @@ public class AdminDonationController {
     }
 
     @PostMapping(value = "/markaz/edit", params = {"id"})
-    @PreAuthorize("hasAuthority('CRUD_MARKAZ')")
+    @PreAuthorize("isAuthenticated() and hasAuthority('CRUD_MARKAZ')")
     public AdminDonationDTO updateMarkazDonation(@RequestParam String id,
                                                  @RequestBody @Valid MarkazDonationRequestDTO requestDTO) {
         DonationDetail detail = repository.getByUniqueId(id)
@@ -188,7 +188,7 @@ public class AdminDonationController {
     }
 
     @PostMapping(value = "/santri/edit", params = {"id"})
-    @PreAuthorize("hasAuthority('CRUD_SANTRI')")
+    @PreAuthorize("isAuthenticated() and hasAuthority('CRUD_SANTRI')")
     public AdminDonationDTO updateSantriDonation(@RequestParam String id,
                                                  @RequestBody @Valid SantriDonationRequestDTO requestDTO) {
         DonationDetail detail = repository.getByUniqueId(id)

@@ -58,9 +58,9 @@ public abstract class FileStorageService {
 
                 fileName = String.format(
                         "%s_%s.%s",
-                        slugify.slugify(fileName.substring(0, fileName.lastIndexOf("."))),
+                        slugify.slugify(fileName.substring(0, fileName.lastIndexOf('.'))),
                         RandomStringUtils.randomAlphanumeric(8),
-                        fileName.substring(fileName.lastIndexOf(".") + 1)
+                        fileName.substring(fileName.lastIndexOf('.') + 1)
                 );
 
                 return fileName;

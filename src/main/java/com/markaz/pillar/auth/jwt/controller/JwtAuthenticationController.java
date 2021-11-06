@@ -3,7 +3,6 @@ package com.markaz.pillar.auth.jwt.controller;
 
 import com.markaz.pillar.auth.jwt.config.JwtTokenUtil;
 import com.markaz.pillar.auth.jwt.controller.exception.InvalidAuthorizationException;
-import com.markaz.pillar.auth.jwt.controller.exception.InvalidTokenException;
 import com.markaz.pillar.auth.jwt.controller.exception.UserDisabledException;
 import com.markaz.pillar.auth.jwt.controller.model.JwtRequest;
 import com.markaz.pillar.auth.jwt.controller.model.JwtResponse;
@@ -15,6 +14,7 @@ import com.markaz.pillar.auth.jwt.service.AuthenticationService;
 import com.markaz.pillar.auth.jwt.service.JwtUserDetailsService;
 import com.markaz.pillar.config.controller.model.annotation.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
@@ -87,14 +88,17 @@ public class JwtAuthenticationController {
 
     @PostMapping("/refresh")
     @ResponseMessage("Token is refreshed!")
-    public JwtResponse refreshToken(@RequestBody RefreshRequest request) throws Exception {
+    public JwtResponse refreshToken(@RequestBody RefreshRequest request) throws NoSuchAlgorithmException {
         String email = jwtTokenUtil.getSubject(request.getAccessToken());
 
         Optional<AuthRefresh> optional = repository.findByRefreshToken(request.getRefreshToken());
         if(optional.isPresent()) {
             AuthRefresh refresh = optional.get();
             if(!refresh.isValid() || !refresh.getEmail().equals(email)) {
-                throw new InvalidTokenException(request.getRefreshToken());
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        String.format("Invalid token %s", request.getRefreshToken())
+                );
             }
 
             refresh.setValid(false);
@@ -102,7 +106,10 @@ public class JwtAuthenticationController {
 
             return authenticationService.generateTokens(refresh.getEmail());
         } else {
-            throw new InvalidTokenException(request.getRefreshToken());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    String.format("Invalid token %s", request.getRefreshToken())
+            );
         }
     }
 }

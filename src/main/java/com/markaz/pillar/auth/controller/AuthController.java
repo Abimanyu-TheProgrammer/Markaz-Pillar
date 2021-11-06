@@ -38,15 +38,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseMessage("AuthUser Successfully Registered")
     public JwtResponse register(@RequestBody @Valid RegistrationRequestDTO requestDTO) throws NoSuchAlgorithmException {
-        AuthUser user = new AuthUser();
-        user.setEmail(requestDTO.getEmail());
-        user.setUsername(requestDTO.getUsername());
-        user.setFullName(requestDTO.getFullName());
-        user.setPhoneNum(requestDTO.getPhoneNum());
-        user.setAddress(requestDTO.getAddress());
-        user.setPassword(requestDTO.getPassword());
-
-        user = registrationService.register(user);
+        AuthUser user = registrationService.register(requestDTO.mapTo());
 
         authenticationService.authenticate(user.getEmail());
         return authenticationService.generateTokens(user.getEmail());

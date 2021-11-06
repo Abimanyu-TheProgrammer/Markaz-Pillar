@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class MarkazSpecs {
-    public static final String[] JABODETABEK = {"jakarta", "bogor", "depok", "tanggerang", "bekasi"};
+    protected static final String[] JABODETABEK = {"jakarta", "bogor", "depok", "tanggerang", "bekasi"};
 
     private MarkazSpecs() {
         throw new IllegalStateException("Utility Class");

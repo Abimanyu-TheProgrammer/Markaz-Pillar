@@ -1,5 +1,6 @@
 package com.markaz.pillar.auth.controller.model;
 
+import com.markaz.pillar.auth.repository.models.AuthUser;
 import com.markaz.pillar.config.validation.ValidPassword;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,4 +40,16 @@ public class RegistrationRequestDTO {
     @Size(max = 512)
     @ValidPassword
     private String password;
+    
+    public AuthUser mapTo() {
+        AuthUser obj = new AuthUser();
+        obj.setEmail(this.getEmail());
+        obj.setUsername(this.getUsername());
+        obj.setFullName(this.getFullName());
+        obj.setPhoneNum(this.getPhoneNum());
+        obj.setAddress(this.getAddress());
+        obj.setPassword(this.getPassword());
+
+        return obj;
+    }
 }

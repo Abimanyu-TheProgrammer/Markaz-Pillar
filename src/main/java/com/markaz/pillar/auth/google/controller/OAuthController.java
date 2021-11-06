@@ -1,5 +1,6 @@
 package com.markaz.pillar.auth.google.controller;
 
+import com.markaz.pillar.auth.controller.model.RegistrationRequestDTO;
 import com.markaz.pillar.auth.google.controller.model.TokenRequest;
 import com.markaz.pillar.auth.google.repository.GoogleTokenRepository;
 import com.markaz.pillar.auth.google.repository.model.GoogleToken;
@@ -102,7 +103,9 @@ public class OAuthController {
 
     @PostMapping(value = "/create", params = {"state"})
     @ResponseStatus(HttpStatus.CREATED)
-    public JwtResponse createUserFromOAuth(@RequestParam String state, @Valid @RequestBody AuthUser request) throws NoSuchAlgorithmException {
+    public JwtResponse createUserFromOAuth(@RequestParam String state,
+                                           @RequestBody @Valid RegistrationRequestDTO request)
+            throws NoSuchAlgorithmException {
         GoogleToken token = repository.getByState(state);
         if(!service.checkToken(token, TokenType.ACCESS_TOKEN)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad State!");
@@ -115,7 +118,7 @@ public class OAuthController {
 
         AuthUser user = userRepository.findByEmail(request.getEmail())
                 .orElseGet(() -> {
-                    AuthUser temp = registrationService.register(request);
+                    AuthUser temp = registrationService.register(request.mapTo());
 
                     token.setState(null);
                     token.setAccount(temp);
