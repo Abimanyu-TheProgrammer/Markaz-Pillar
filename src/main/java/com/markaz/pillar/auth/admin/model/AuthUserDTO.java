@@ -1,4 +1,4 @@
-package com.markaz.pillar.admin.controller.model;
+package com.markaz.pillar.auth.admin.model;
 
 import com.markaz.pillar.auth.repository.models.AuthUser;
 import lombok.Builder;

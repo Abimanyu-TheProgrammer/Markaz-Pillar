@@ -1,6 +1,6 @@
-package com.markaz.pillar.admin.controller;
+package com.markaz.pillar.auth.admin;
 
-import com.markaz.pillar.admin.controller.model.AuthUserDTO;
+import com.markaz.pillar.auth.admin.model.AuthUserDTO;
 import com.markaz.pillar.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
