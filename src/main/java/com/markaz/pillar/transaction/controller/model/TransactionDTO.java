@@ -1,5 +1,6 @@
 package com.markaz.pillar.transaction.controller.model;
 
+import com.markaz.pillar.donation.repository.model.DonationDetail;
 import com.markaz.pillar.transaction.repository.model.TransactionStatus;
 import com.markaz.pillar.transaction.repository.model.UserTransaction;
 import lombok.Builder;
@@ -46,13 +47,17 @@ public class TransactionDTO {
     private String reason;
 
     public static TransactionDTO mapFrom(UserTransaction obj) {
+        DonationDetail donationDetail = obj.getDonationDetail();
         return builder()
                 .trxId(obj.getTrxId())
                 .paymentURL(obj.getDonationURL())
                 .amount(obj.getAmount())
-                .donationId(obj.getDonationDetail().getId())
-                .donationUniqueId(obj.getDonationDetail().getUniqueId())
-                .donationName(obj.getDonationDetail().getName())
+                .donationId(donationDetail.getId())
+                .donationUniqueId(donationDetail.getUniqueId())
+                .donationName(
+                        donationDetail.getMarkaz() == null ?
+                                donationDetail.getSantri().getName() : donationDetail.getMarkaz().getName()
+                )
                 .userEmail(obj.getUser().getEmail())
                 .status(obj.getStatus())
                 .createdAt(obj.getCreatedAt())

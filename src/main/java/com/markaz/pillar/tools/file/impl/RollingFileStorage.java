@@ -12,21 +12,21 @@ public class RollingFileStorage extends FileStorageService {
     @Override
     public String getDirectory() {
         Calendar systemDate = Calendar.getInstance();
-        return String.format("%s/%d/%d", directory, systemDate.get(Calendar.YEAR), systemDate.get(Calendar.MONTH)+1);
+        return String.format("%s/%d/%d", getDir(), systemDate.get(Calendar.YEAR), systemDate.get(Calendar.MONTH)+1);
     }
 
     @Override
     public String getRootDirectory() {
-        return rootDir;
+        return getRootDir();
     }
 
     @Override
     public String resolveAbsoluteURL(Path relativeDir, String filename) {
-        return String.format("%s%s/%s", rootUrl, relativeDir.toString(), filename);
+        return String.format("%s%s/%s", getRootUrl(), relativeDir.toString(), filename);
     }
 
     @Override
     protected List<String> getAllowedContentType() {
-        return allowedContentTypes;
+        return getContentTypes();
     }
 }
