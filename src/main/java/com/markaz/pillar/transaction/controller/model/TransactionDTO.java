@@ -34,6 +34,9 @@ public class TransactionDTO {
     private String donationName;
 
     @NotNull
+    private String donationType;
+
+    @NotNull
     private String userEmail;
 
     @NotNull
@@ -58,6 +61,7 @@ public class TransactionDTO {
                         donationDetail.getMarkaz() == null ?
                                 donationDetail.getSantri().getName() : donationDetail.getMarkaz().getName()
                 )
+                .donationType(donationDetail.getMarkaz() == null ? "SANTRI" : "MARKAZ")
                 .userEmail(obj.getUser().getEmail())
                 .status(obj.getStatus())
                 .createdAt(obj.getCreatedAt())
