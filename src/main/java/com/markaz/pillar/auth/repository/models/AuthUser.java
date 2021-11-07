@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.markaz.pillar.auth.google.repository.model.GoogleToken;
 import com.markaz.pillar.config.validation.ValidPassword;
-import com.markaz.pillar.donation.repository.model.UserDonation;
+import com.markaz.pillar.transaction.repository.model.UserTransaction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -98,5 +98,5 @@ public class AuthUser {
     private boolean isActive = true;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<UserDonation> donations;
+    private Set<UserTransaction> donations;
 }

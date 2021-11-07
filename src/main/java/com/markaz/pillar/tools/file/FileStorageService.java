@@ -1,7 +1,10 @@
 package com.markaz.pillar.tools.file;
 
 import com.github.slugify.Slugify;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,7 +15,20 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
+@Getter(value = AccessLevel.PROTECTED)
 public abstract class FileStorageService {
+    @Value("${service.storage.root}")
+    private String rootDir;
+
+    @Value("${service.storage.static.dir}")
+    private String dir;
+
+    @Value("${service.storage.url}")
+    private String rootUrl;
+
+    @Value("#{'${service.storage.allowed-content-types}'.split(',')}")
+    private List<String> contentTypes;
+
     private final Slugify slugify;
 
     protected FileStorageService() {
@@ -58,9 +74,9 @@ public abstract class FileStorageService {
 
                 fileName = String.format(
                         "%s_%s.%s",
-                        slugify.slugify(fileName.substring(0, fileName.lastIndexOf("."))),
+                        slugify.slugify(fileName.substring(0, fileName.lastIndexOf('.'))),
                         RandomStringUtils.randomAlphanumeric(8),
-                        fileName.substring(fileName.lastIndexOf(".") + 1)
+                        fileName.substring(fileName.lastIndexOf('.') + 1)
                 );
 
                 return fileName;

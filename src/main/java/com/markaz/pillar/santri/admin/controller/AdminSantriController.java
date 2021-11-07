@@ -53,7 +53,7 @@ public class AdminSantriController {
             throws IOException {
         Markaz markaz = markazRepository.getById(markazId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz not found"));
-        if(repository.existsByNameAndMarkaz_Id(santri.getName(), markazId)) {
+        if(repository.existsByNameAndMarkazId(santri.getName(), markazId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri with the same name exists");
         }
 
@@ -89,7 +89,7 @@ public class AdminSantriController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri not found"));
 
         if(!entity.getName().equals(santri.getName())
-                && repository.existsByNameAndMarkaz_Id(santri.getName(), entity.getMarkaz().getId())) {
+                && repository.existsByNameAndMarkazId(santri.getName(), entity.getMarkaz().getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Santri with the same name exists");
         }
 

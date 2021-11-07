@@ -39,7 +39,7 @@ public class GoogleTokenRepositoryImpl implements GoogleTokenAddOn {
     @Override
     public GoogleToken refreshToken(AuthUser user) {
         GoogleToken token = Optional.ofNullable(user.getToken())
-                .orElse(repository.findFirstByAccount_IdOrderByCreatedAtDesc(user.getId()));
+                .orElse(repository.findFirstByAccountIdOrderByCreatedAtDesc(user.getId()));
 
         LocalDateTime currentTimestamp = LocalDateTime.now();
         TokenResponse tokenResponse = oAuthService.refreshToken(token.getRefreshToken());

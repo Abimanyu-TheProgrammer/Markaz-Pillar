@@ -45,23 +45,58 @@ public class SantriController {
         );
     }
 
-    @GetMapping("/search")
+    @GetMapping(value = "/search")
     public Page<SantriSimpleDTO> fetchSimpleAll(@RequestParam(required = false) String name,
                                                 @RequestParam(required = false) String markaz,
-                                                @RequestParam(defaultValue = "ASC") Sort.Direction sortedName,
-                                                @RequestParam(defaultValue = "ASC") Sort.Direction sortedAge,
                                                 @RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "10") int n) {
         Specification<Santri> searchSpec = Specification.where(SantriSpecs.nameLike(name))
                 .and(SantriSpecs.markazLike(markaz));
 
         return repository.findAll(
-                        searchSpec,
-                        PageRequest.of(
-                                page, n,
-                                Sort.by(sortedName, "name")
-                                        .and(Sort.by(sortedAge, "birthDate"))
-                        )
-                ).map(SantriSimpleDTO::mapFrom);
+                searchSpec,
+                PageRequest.of(page, n)
+        ).map(SantriSimpleDTO::mapFrom);
+    }
+
+    @GetMapping(value = "/search", params = {"sortedAge"})
+    public Page<SantriSimpleDTO> fetchSimpleAllAge(@RequestParam(required = false) String name,
+                                                   @RequestParam(required = false) String markaz,
+                                                   @RequestParam(defaultValue = "ASC") Sort.Direction sortedAge,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int n) {
+        Specification<Santri> searchSpec = Specification.where(SantriSpecs.nameLike(name))
+                .and(SantriSpecs.markazLike(markaz));
+
+        return repository.findAll(
+                searchSpec,
+                PageRequest.of(
+                        page, n,
+                        Sort.by(sortedAge, "birthDate")
+                )
+        ).map(SantriSimpleDTO::mapFrom);
+    }
+
+    @GetMapping(value = "/search", params = {"sortedName"})
+    public Page<SantriSimpleDTO> fetchSimpleAllName(@RequestParam(required = false) String name,
+                                                    @RequestParam(required = false) String markaz,
+                                                    @RequestParam(defaultValue = "ASC") Sort.Direction sortedName,
+                                                    @RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "10") int n) {
+        Specification<Santri> searchSpec = Specification.where(SantriSpecs.nameLike(name))
+                .and(SantriSpecs.markazLike(markaz));
+
+        return repository.findAll(
+                searchSpec,
+                PageRequest.of(
+                        page, n,
+                        Sort.by(sortedName, "name")
+                )
+        ).map(SantriSimpleDTO::mapFrom);
+    }
+
+    @GetMapping(value = "/search", params = {"sortedName", "sortedAge"})
+    public Page<SantriSimpleDTO> fetchSimpleAllError() {
+        throw new IllegalArgumentException("sortedName and sortedAge cannot be used together");
     }
 }

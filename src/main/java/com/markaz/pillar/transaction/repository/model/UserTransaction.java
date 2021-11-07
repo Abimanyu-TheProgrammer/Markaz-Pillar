@@ -1,11 +1,11 @@
-package com.markaz.pillar.donation.repository.model;
+package com.markaz.pillar.transaction.repository.model;
 
 import com.markaz.pillar.auth.repository.models.AuthUser;
+import com.markaz.pillar.donation.repository.model.DonationDetail;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -31,8 +31,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
-@Where(clause = "is_active = 1")
-public class UserDonation {
+public class UserTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -60,7 +59,7 @@ public class UserDonation {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private DonationStatus status = DonationStatus.MENUNGGU_KONFIRMASI;
+    private TransactionStatus status = TransactionStatus.MENUNGGU_KONFIRMASI;
 
     private String reason;
 

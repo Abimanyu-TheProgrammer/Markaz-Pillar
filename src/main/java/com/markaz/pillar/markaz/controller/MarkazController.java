@@ -49,13 +49,15 @@ public class MarkazController {
     @GetMapping("/search")
     public Page<MarkazSimpleDTO> fetchSimpleAll(@RequestParam(required = false) String name,
                                                 @RequestParam(required = false) Boolean address,
-                                                @RequestParam(required = false) MarkazDonationCategory category,
+                                                @RequestParam(
+                                                        name = "category", required = false
+                                                ) MarkazDonationCategory[] categories,
                                                 @RequestParam(defaultValue = "ASC") Sort.Direction sortedName,
                                                 @RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "10") int n) {
         Specification<Markaz> searchSpec = Specification.where(MarkazSpecs.nameLike(name))
                 .and(MarkazSpecs.addressLike(address))
-                .and(MarkazSpecs.categoryLike(category));
+                .and(MarkazSpecs.categoriesLike(categories));
 
         return repository.findAll(
                         searchSpec,

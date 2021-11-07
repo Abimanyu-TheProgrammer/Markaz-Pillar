@@ -1,5 +1,6 @@
 package com.markaz.pillar.auth.controller;
 
+import com.markaz.pillar.auth.controller.model.RegistrationRequestDTO;
 import com.markaz.pillar.auth.jwt.controller.model.JwtResponse;
 import com.markaz.pillar.auth.jwt.service.AuthenticationService;
 import com.markaz.pillar.auth.repository.models.AuthUser;
@@ -29,15 +30,15 @@ public class AuthController {
     }
 
     @Autowired
-    public void setAuthService(RegistrationService registrationService) {
+    public void setRegistrationService(RegistrationService registrationService) {
         this.registrationService = registrationService;
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseMessage("AuthUser Successfully Registered")
-    public JwtResponse register(@Valid @RequestBody AuthUser authUser) throws NoSuchAlgorithmException {
-        AuthUser user = registrationService.register(authUser);
+    public JwtResponse register(@RequestBody @Valid RegistrationRequestDTO requestDTO) throws NoSuchAlgorithmException {
+        AuthUser user = registrationService.register(requestDTO.mapTo());
 
         authenticationService.authenticate(user.getEmail());
         return authenticationService.generateTokens(user.getEmail());
