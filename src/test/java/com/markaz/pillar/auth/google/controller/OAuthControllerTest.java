@@ -146,9 +146,9 @@ class OAuthControllerTest {
                         .content(String.format("{\"code\": \"%s\"}", code)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.sub").doesNotExist())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(credentialResponse.getName()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value(credentialResponse.getEmail()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.credential.sub").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.credential.name").value(credentialResponse.getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.credential.email").value(credentialResponse.getEmail()));
     }
 
     @Test

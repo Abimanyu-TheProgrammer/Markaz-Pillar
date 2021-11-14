@@ -41,7 +41,7 @@ public final class MarkazSpecs {
                     );
                 }
 
-                return isJabodetabek ? predicate : predicate.not();
+                return Boolean.TRUE.equals(isJabodetabek) ? predicate : predicate.not();
             }
         };
     }

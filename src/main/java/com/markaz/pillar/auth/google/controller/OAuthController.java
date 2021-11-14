@@ -82,7 +82,9 @@ public class OAuthController {
     }
 
     @PostMapping(value = "/token", params = {"state"})
-    public ResponseEntity<?> generateToken(@RequestParam String state, @RequestBody @Valid TokenRequest request) throws NoSuchAlgorithmException {
+    public ResponseEntity<TokenResponse> generateToken(@RequestParam String state,
+                                                       @RequestBody @Valid TokenRequest request)
+            throws NoSuchAlgorithmException {
         GoogleToken token = repository.createToken(state, request.getCode());
         CredentialResponse response = service.getCredentials(token);
 
@@ -95,10 +97,18 @@ public class OAuthController {
 
             authenticationService.authenticate(user.getEmail());
 
-            return ResponseEntity.ok(authenticationService.generateTokens(user.getEmail()));
+            return ResponseEntity.ok(
+                    TokenResponse.builder()
+                            .token(authenticationService.generateTokens(user.getEmail()))
+                            .build()
+            );
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                TokenResponse.builder()
+                        .credential(response)
+                        .build()
+        );
     }
 
     @PostMapping(value = "/create", params = {"state"})

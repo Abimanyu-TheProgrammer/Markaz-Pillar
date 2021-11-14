@@ -23,8 +23,6 @@ import java.util.List;
 @Table(
         name = "santri_data",
         indexes = {
-                @Index(columnList = "name", unique = true),
-                @Index(columnList = "slug", unique = true),
                 @Index(columnList = "birth_date")
         }
 )
