@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
-public class EditStatusRequestDTO {
+public class EditTransactionStatusRequestDTO {
     private Long amount;
 
     @NotNull

@@ -2,7 +2,7 @@ package com.markaz.pillar.transaction.controller.admin;
 
 import com.markaz.pillar.donation.repository.DonationRepository;
 import com.markaz.pillar.donation.repository.model.DonationDetail;
-import com.markaz.pillar.transaction.controller.admin.model.EditStatusRequestDTO;
+import com.markaz.pillar.transaction.controller.admin.model.EditTransactionStatusRequestDTO;
 import com.markaz.pillar.transaction.controller.model.TransactionDTO;
 import com.markaz.pillar.transaction.repository.UserTransactionRepository;
 import com.markaz.pillar.transaction.repository.model.TransactionStatus;
@@ -36,7 +36,7 @@ public class AdminTransactionController {
 
     @PostMapping(value = "/status", params = {"id"})
     public TransactionDTO editTransactionStatus(@RequestParam(name = "id") String trxId,
-                                                @RequestBody @Valid EditStatusRequestDTO requestDTO) {
+                                                @RequestBody @Valid EditTransactionStatusRequestDTO requestDTO) {
         UserTransaction transaction = repository.findByTrxId(trxId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found!"));
 

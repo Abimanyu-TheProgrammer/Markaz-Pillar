@@ -1,5 +1,6 @@
 package com.markaz.pillar.volunteer.admin.controller;
 
+import com.markaz.pillar.volunteer.admin.controller.model.EditRegistrationStatusRequestDTO;
 import com.markaz.pillar.volunteer.admin.controller.model.RegistrationDTO;
 import com.markaz.pillar.volunteer.admin.controller.search.RegistrationSpecs;
 import com.markaz.pillar.volunteer.repository.VolunteerRepository;
@@ -11,11 +12,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/admin/volunteer/registration")
@@ -46,5 +46,21 @@ public class AdminRegistrationController {
 
         return repository.findAll(specification, PageRequest.of(page, n))
                 .map(RegistrationDTO::mapFrom);
+    }
+
+    @PostMapping(value = "/status", params = {"id"})
+    public RegistrationDTO editVolunteerStatus(@RequestParam(name = "id") int id,
+                                               @RequestBody @Valid EditRegistrationStatusRequestDTO requestDTO) {
+        VolunteerRegistration registration = repository.getById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found!"));
+
+        registration.setStatus(requestDTO.getStatus());
+        if(requestDTO.getReason() != null
+                && !requestDTO.getReason().isEmpty()
+                && RegistrationStatus.PENDAFTARAN_DITOLAK.equals(requestDTO.getStatus())) {
+            registration.setReason(requestDTO.getReason());
+        }
+
+        return RegistrationDTO.mapFrom(repository.save(registration));
     }
 }
