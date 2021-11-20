@@ -23,9 +23,6 @@ public class RegistrationSpecs {
         return (root, query, builder) ->
                 status == null ?
                         builder.conjunction() :
-                        builder.equal(
-                                root.get("status"),
-                                status.toString()
-                        );
+                        builder.equal(root.get("status"), status);
     }
 }
