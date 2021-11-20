@@ -8,6 +8,6 @@ create table donation_progress
     constraint donation_progress_pk
         primary key (id),
     constraint donation_progress_donation_detail_id_fk
-        foreign key (donation_id) references volunteer_program (id)
+        foreign key (donation_id) references donation_detail (id)
             on delete cascade
 );
