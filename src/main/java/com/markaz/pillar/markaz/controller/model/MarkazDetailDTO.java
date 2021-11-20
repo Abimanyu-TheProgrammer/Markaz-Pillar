@@ -1,5 +1,7 @@
 package com.markaz.pillar.markaz.controller.model;
 
+import com.markaz.pillar.donation.controller.admin.model.DonationProgressDTO;
+import com.markaz.pillar.donation.repository.model.DonationDetail;
 import com.markaz.pillar.donation.repository.model.MarkazDonationCategory;
 import com.markaz.pillar.markaz.repository.model.Markaz;
 import com.markaz.pillar.markaz.repository.model.MarkazCategory;
@@ -11,7 +13,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -52,6 +56,7 @@ public class MarkazDetailDTO {
     private String description;
     private Long nominal;
     private Long donated;
+    private List<DonationProgressDTO> progress;
 
     public static MarkazDetailDTO mapFrom(Markaz obj) {
         MarkazDetailDTOBuilder builder = builder()
@@ -66,10 +71,16 @@ public class MarkazDetailDTO {
                 .contactInfo(obj.getContactInfo());
 
         if(!obj.getDonationDetails().isEmpty()) {
-            builder = builder.donationCategories(obj.getDonationDetails().get(0).getCategories())
-                    .description(obj.getDonationDetails().get(0).getDescription())
-                    .nominal(obj.getDonationDetails().get(0).getNominal())
-                    .donated(obj.getDonationDetails().get(0).getDonated());
+            DonationDetail donationDetail = obj.getDonationDetails().get(0);
+            builder = builder.donationCategories(donationDetail.getCategories())
+                    .description(donationDetail.getDescription())
+                    .nominal(donationDetail.getNominal())
+                    .donated(donationDetail.getDonated())
+                    .progress(
+                            donationDetail.getProgresses().stream()
+                                    .map(DonationProgressDTO::mapFrom)
+                                    .collect(Collectors.toList())
+                    );
         }
 
         return builder.build();
