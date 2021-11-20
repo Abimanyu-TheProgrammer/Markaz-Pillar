@@ -1,5 +1,6 @@
 package com.markaz.pillar.volunteer.admin.controller;
 
+import com.markaz.pillar.config.controller.model.annotation.ResponseMessage;
 import com.markaz.pillar.tools.file.impl.StaticImageStorage;
 import com.markaz.pillar.volunteer.admin.controller.model.TestimonyDTO;
 import com.markaz.pillar.volunteer.admin.controller.model.TestimonyRequestDTO;
@@ -9,6 +10,7 @@ import com.markaz.pillar.volunteer.repository.model.ProgramTestimony;
 import com.markaz.pillar.volunteer.repository.model.VolunteerProgram;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,8 +43,8 @@ public class AdminTestimonyController {
         this.testimonyRepository = testimonyRepository;
     }
 
-    @PostMapping(params = {"id"})
-    public TestimonyDTO createTestimony(@RequestParam Integer id,
+    @PostMapping(params = {"program_id"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public TestimonyDTO createTestimony(@RequestParam(name = "program_id") Integer id,
                                         @RequestPart MultipartFile thumbnail,
                                         @RequestPart @Valid TestimonyRequestDTO detail) throws IOException {
         VolunteerProgram program = repository.getById(id)
@@ -57,8 +59,31 @@ public class AdminTestimonyController {
         entity.setThumbnailURL(thumbnailURL);
         entity.setDescription(detail.getDescription());
 
-        entity.setProgram(program);
         program.getTestimonies().add(entity);
+        entity.setProgram(program);
+
+        return TestimonyDTO.mapFrom(testimonyRepository.save(entity));
+    }
+
+    @PostMapping(
+            value = "/edit",
+            params = {"id"},
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @ResponseMessage("Testimony is updated!")
+    public TestimonyDTO updateById(@RequestParam int id,
+                                          @RequestPart(required = false) MultipartFile thumbnail,
+                                          @RequestPart @Valid TestimonyRequestDTO detail) throws IOException {
+        ProgramTestimony entity = testimonyRepository.getById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Testimony not found"));
+
+        entity.setName(detail.getName());
+        entity.setDescription(detail.getDescription());
+
+        if(thumbnail != null) {
+            String thumbnailURL = fileStorage.saveFile(thumbnail, Paths.get("markaz", "thumbnail"));
+            entity.setThumbnailURL(thumbnailURL);
+        }
 
         return TestimonyDTO.mapFrom(testimonyRepository.save(entity));
     }
