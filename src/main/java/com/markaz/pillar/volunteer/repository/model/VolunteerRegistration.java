@@ -34,11 +34,17 @@ public class VolunteerRegistration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne(targetEntity = VolunteerProgram.class, cascade = CascadeType.ALL)
+    @ManyToOne(
+            targetEntity = VolunteerProgram.class,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
+    )
     @JoinColumn(name = "program_id", nullable = false)
     private VolunteerProgram program;
 
-    @ManyToOne(targetEntity = AuthUser.class, cascade = CascadeType.ALL)
+    @ManyToOne(
+            targetEntity = AuthUser.class,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
+    )
     @JoinColumn(name = "user_id", nullable = false)
     private AuthUser user;
 
