@@ -84,6 +84,7 @@ public class AuthUser {
     private String phoneNum;
 
     @NotBlank
+    @Size(max = 4096)
     private String address;
 
     @CreatedDate

@@ -1,7 +1,5 @@
-package com.markaz.pillar.transaction.repository.model;
+package com.markaz.pillar.volunteer.repository.model;
 
-import com.markaz.pillar.auth.repository.models.AuthUser;
-import com.markaz.pillar.donation.repository.model.DonationDetail;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,52 +12,75 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(
-        name = "user_donation",
+        name = "volunteer_registration",
         indexes = {
-                @Index(columnList = "trx_id", unique = true)
+                @Index(columnList = "name"),
+                @Index(columnList = "status")
         }
 )
 @Getter
 @Setter
 @ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
-public class UserTransaction {
+public class VolunteerRegistration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "trx_id")
-    @NotBlank
-    private String trxId;
-
-    @ManyToOne(targetEntity = DonationDetail.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "donation_id", nullable = false)
-    private DonationDetail donationDetail;
-
-    @ManyToOne(targetEntity = AuthUser.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", nullable = false)
-    private AuthUser user;
+    @ManyToOne(targetEntity = Program.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "program_id", nullable = false)
+    private Program program;
 
     @NotBlank
-    @URL
+    @Size(max = 256)
+    @ToString.Include
+    private String name;
+
+    @NotBlank
+    @Size(max = 30)
+    @Pattern(regexp = "^\\d{6}([04][1-9]|[1256][0-9]|[37][01])(0[1-9]|1[0-2])\\d{2}\\d{4}$")
+    private String ktp;
+
+    @NotBlank
+    @Size(min = 9, max = 30)
+    @Pattern(regexp = "^(\\+62|62)?[\\s-]?0?8[1-9]{1}\\d{1}[\\s-]?\\d{4}[\\s-]?\\d{2,5}$")
+    @Column(name = "phone_num")
+    private String phoneNum;
+
+    @Size(max = 512)
+    @NotBlank
+    @Email
+    @ToString.Include
+    private String email;
+
+    @NotBlank
     @Size(max = 2048)
-    @Column(name = "donation_url")
-    private String donationURL;
+    private String address;
 
-    @NotNull
-    private Long amount;
+    @Size(max = 2048)
+    @URL
+    @Column(name = "picture_url")
+    private String pictureURL;
+
+    @Size(max = 2048)
+    @URL
+    @Column(name = "essay_url")
+    private String essayURL;
+
+    @Size(max = 2048)
+    @URL
+    @Column(name = "cv_url")
+    private String cvURL;
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private TransactionStatus status = TransactionStatus.MENUNGGU_KONFIRMASI;
+    private RegistrationStatus status = RegistrationStatus.MENUNGGU_KONFIRMASI;
 
     @Size(max = 2048)
     private String reason;
