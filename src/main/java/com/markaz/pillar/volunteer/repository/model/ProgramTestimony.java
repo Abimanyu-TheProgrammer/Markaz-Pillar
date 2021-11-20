@@ -21,9 +21,9 @@ public class ProgramTestimony {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne(targetEntity = Program.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = VolunteerProgram.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "program_id", nullable = false)
-    private Program program;
+    private VolunteerProgram program;
 
     @NotBlank
     @URL

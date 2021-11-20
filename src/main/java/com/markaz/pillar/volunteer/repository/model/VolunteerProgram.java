@@ -36,7 +36,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Where(clause = "is_active = 1")
 @SQLDelete(sql = "update volunteer_program set is_active = false where id = ?")
-public class Program {
+public class VolunteerProgram {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -69,8 +69,8 @@ public class Program {
     private String benefit;
 
     @NotNull
-    @Column(name = "volunteer_needed")
     @PositiveOrZero
+    @Column(name = "volunteer_needed")
     private Integer volunteerNeeded;
 
     @Formula("coalesce((select sum(u.amount) " +
