@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
+import org.springframework.util.unit.DataSize;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,9 +27,6 @@ public abstract class FileStorageService {
 
     @Value("${service.storage.url}")
     private String rootUrl;
-
-    @Value("#{'${service.storage.allowed-content-types}'.split(',')}")
-    private List<String> contentTypes;
 
     private final Slugify slugify;
 
@@ -51,6 +50,16 @@ public abstract class FileStorageService {
         if(file.isEmpty()) {
             throw new IllegalArgumentException("File cannot be empty!");
         }
+
+        String contentType = file.getContentType();
+        if(!getAllowedContentType().contains(contentType)) {
+            throw new IllegalArgumentException(String.format("File type %s is not allowed!", contentType));
+        }
+
+        DataSize dataSize = DataSize.parse(getAllowedFileSize());
+        if(file.getSize() > dataSize.toBytes()) {
+            throw new MaxUploadSizeExceededException(dataSize.toBytes());
+        }
     }
 
     protected Path resolveUploadDir(Path relativeDir, String fileName) throws IOException {
@@ -67,24 +76,19 @@ public abstract class FileStorageService {
     }
 
     protected String cleanFileName(MultipartFile file) {
-        String contentType = file.getContentType();
-        if(getAllowedContentType().contains(contentType)) {
-            try {
-                String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        try {
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
-                fileName = String.format(
-                        "%s_%s.%s",
-                        slugify.slugify(fileName.substring(0, fileName.lastIndexOf('.'))),
-                        RandomStringUtils.randomAlphanumeric(8),
-                        fileName.substring(fileName.lastIndexOf('.') + 1)
-                );
+            fileName = String.format(
+                    "%s_%s.%s",
+                    slugify.slugify(fileName.substring(0, fileName.lastIndexOf('.'))),
+                    RandomStringUtils.randomAlphanumeric(8),
+                    fileName.substring(fileName.lastIndexOf('.') + 1)
+            );
 
-                return fileName;
-            } catch (IndexOutOfBoundsException | NullPointerException e) {
-                throw new IllegalArgumentException("Invalid Filename!", e);
-            }
-        } else {
-            throw new IllegalArgumentException(String.format("File type %s is not allowed!", contentType));
+            return fileName;
+        } catch (IndexOutOfBoundsException | NullPointerException e) {
+            throw new IllegalArgumentException("Invalid Filename!", e);
         }
     }
 
@@ -92,4 +96,5 @@ public abstract class FileStorageService {
     protected abstract String getRootDirectory();
     protected abstract String resolveAbsoluteURL(Path relativeDir, String filename);
     protected abstract List<String> getAllowedContentType();
+    protected abstract String getAllowedFileSize();
 }

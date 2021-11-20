@@ -8,7 +8,7 @@ import com.markaz.pillar.santri.admin.controller.markaz.SantriRequestDTO;
 import com.markaz.pillar.santri.controller.model.SantriDetailDTO;
 import com.markaz.pillar.santri.repository.SantriRepository;
 import com.markaz.pillar.santri.repository.model.Santri;
-import com.markaz.pillar.tools.file.impl.StaticFileStorage;
+import com.markaz.pillar.tools.file.impl.StaticImageStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,7 +27,7 @@ import java.nio.file.Paths;
 public class AdminSantriController {
     private SantriRepository repository;
     private MarkazRepository markazRepository;
-    private StaticFileStorage fileStorage;
+    private StaticImageStorage fileStorage;
 
     @Autowired
     public void setMarkazRepository(MarkazRepository markazRepository) {
@@ -40,7 +40,7 @@ public class AdminSantriController {
     }
 
     @Autowired
-    public void setFileStorage(StaticFileStorage fileStorage) {
+    public void setFileStorage(StaticImageStorage fileStorage) {
         this.fileStorage = fileStorage;
     }
 

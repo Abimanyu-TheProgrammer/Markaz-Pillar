@@ -6,7 +6,7 @@ import com.markaz.pillar.markaz.admin.controller.model.MarkazRequestDTO;
 import com.markaz.pillar.markaz.controller.model.MarkazDetailDTO;
 import com.markaz.pillar.markaz.repository.MarkazRepository;
 import com.markaz.pillar.markaz.repository.model.Markaz;
-import com.markaz.pillar.tools.file.impl.StaticFileStorage;
+import com.markaz.pillar.tools.file.impl.StaticImageStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,10 +24,10 @@ import java.nio.file.Paths;
 @PreAuthorize("isAuthenticated() and hasAuthority('CRUD_MARKAZ')")
 public class AdminMarkazController {
     private MarkazRepository repository;
-    private StaticFileStorage fileStorage;
+    private StaticImageStorage fileStorage;
 
     @Autowired
-    public void setFileStorage(StaticFileStorage fileStorage) {
+    public void setFileStorage(StaticImageStorage fileStorage) {
         this.fileStorage = fileStorage;
     }
 

@@ -4,7 +4,7 @@ import com.markaz.pillar.auth.admin.model.AuthUserDTO;
 import com.markaz.pillar.auth.controller.model.EditProfileRequestDTO;
 import com.markaz.pillar.auth.repository.UserRepository;
 import com.markaz.pillar.auth.repository.models.AuthUser;
-import com.markaz.pillar.tools.file.impl.StaticFileStorage;
+import com.markaz.pillar.tools.file.impl.StaticImageStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,7 +22,7 @@ import java.security.Principal;
 @PreAuthorize("isAuthenticated()")
 public class UserController {
     private UserRepository repository;
-    private StaticFileStorage fileStorage;
+    private StaticImageStorage fileStorage;
 
     @Autowired
     public void setRepository(UserRepository repository) {
@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @Autowired
-    public void setFileStorage(StaticFileStorage fileStorage) {
+    public void setFileStorage(StaticImageStorage fileStorage) {
         this.fileStorage = fileStorage;
     }
 
