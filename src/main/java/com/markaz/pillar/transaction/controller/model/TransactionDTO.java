@@ -25,16 +25,13 @@ public class TransactionDTO {
     private Long amount;
 
     @NotNull
-    private Integer donationId;
+    private Integer targetId;
 
     @NotNull
-    private String donationUniqueId;
+    private String targetName;
 
     @NotNull
-    private String donationName;
-
-    @NotNull
-    private String donationType;
+    private String targetType;
 
     @NotNull
     private String userEmail;
@@ -55,13 +52,12 @@ public class TransactionDTO {
                 .trxId(obj.getTrxId())
                 .paymentURL(obj.getDonationURL())
                 .amount(obj.getAmount())
-                .donationId(donationDetail.getId())
-                .donationUniqueId(donationDetail.getUniqueId())
-                .donationName(
+                .targetId(donationDetail.getId())
+                .targetName(
                         donationDetail.getMarkaz() == null ?
                                 donationDetail.getSantri().getName() : donationDetail.getMarkaz().getName()
                 )
-                .donationType(donationDetail.getMarkaz() == null ? "SANTRI" : "MARKAZ")
+                .targetType(donationDetail.getMarkaz() == null ? "SANTRI" : "MARKAZ")
                 .userEmail(obj.getUser().getEmail())
                 .status(obj.getStatus())
                 .createdAt(obj.getCreatedAt())

@@ -1,5 +1,6 @@
 package com.markaz.pillar.volunteer.repository.model;
 
+import com.markaz.pillar.auth.repository.models.AuthUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +37,10 @@ public class VolunteerRegistration {
     @ManyToOne(targetEntity = VolunteerProgram.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "program_id", nullable = false)
     private VolunteerProgram program;
+
+    @ManyToOne(targetEntity = AuthUser.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AuthUser user;
 
     @NotBlank
     @Size(max = 256)

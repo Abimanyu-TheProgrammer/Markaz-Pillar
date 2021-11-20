@@ -87,4 +87,10 @@ public class AdminTestimonyController {
 
         return TestimonyDTO.mapFrom(testimonyRepository.save(entity));
     }
+
+    @DeleteMapping(params = {"id"})
+    @ResponseMessage("Entity is deleted")
+    public void softDeleteByID(@RequestParam int id) {
+        testimonyRepository.deleteById(id);
+    }
 }

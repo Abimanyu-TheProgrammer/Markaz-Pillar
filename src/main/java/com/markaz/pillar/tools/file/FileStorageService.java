@@ -46,7 +46,7 @@ public abstract class FileStorageService {
         return resolveAbsoluteURL(relativeDir, fileName);
     }
 
-    protected void validateFile(MultipartFile file) {
+    public void validateFile(MultipartFile file) {
         if(file.isEmpty()) {
             throw new IllegalArgumentException("File cannot be empty!");
         }

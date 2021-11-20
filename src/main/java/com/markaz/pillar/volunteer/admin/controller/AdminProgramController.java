@@ -92,4 +92,10 @@ public class AdminProgramController {
 
         return VolunteerProgramDTO.mapFrom(repository.save(entity));
     }
+
+    @DeleteMapping(params = {"id"})
+    @ResponseMessage("Entity is deleted")
+    public void softDeleteByID(@RequestParam int id) {
+        repository.deleteById(id);
+    }
 }
