@@ -10,6 +10,7 @@ import com.markaz.pillar.transaction.repository.model.UserTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -55,13 +56,17 @@ public class AdminTransactionController {
     }
 
     @GetMapping(params = {"id"})
-    public Page<TransactionDTO> fetchTransactionsByMarkaz(@RequestParam String id,
-                                                          @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "10") int n) {
+    public Page<TransactionDTO> fetchTransactionsByDonation(@RequestParam String id,
+                                                            @RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "10") int n,
+                                                            @RequestParam(name = "q", required = false) String query) {
         DonationDetail donationDetail = donationRepository.getByUniqueId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));
 
-        return repository.findAllByDonationDetail(donationDetail, PageRequest.of(page, n))
+        Specification<UserTransaction> specification = TransactionSpecs.donationEqual(donationDetail)
+                .and(TransactionSpecs.nameOrUniqueIdLike(query));
+
+        return repository.findAll(specification, PageRequest.of(page, n))
                 .map(TransactionDTO::mapFrom);
     }
 }
