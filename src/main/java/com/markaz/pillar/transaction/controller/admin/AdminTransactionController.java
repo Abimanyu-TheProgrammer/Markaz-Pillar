@@ -64,7 +64,7 @@ public class AdminTransactionController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Markaz doesn't exist!"));
 
         Specification<UserTransaction> specification = TransactionSpecs.donationEqual(donationDetail)
-                .and(TransactionSpecs.nameOrUniqueIdLike(query));
+                .and(TransactionSpecs.emailOrUniqueIdLike(query));
 
         return repository.findAll(specification, PageRequest.of(page, n))
                 .map(TransactionDTO::mapFrom);

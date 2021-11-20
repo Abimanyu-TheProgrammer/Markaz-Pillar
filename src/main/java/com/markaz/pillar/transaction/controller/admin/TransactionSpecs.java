@@ -9,13 +9,13 @@ public class TransactionSpecs {
         throw new IllegalStateException("Utility Class");
     }
 
-    public static Specification<UserTransaction> nameOrUniqueIdLike(String s) {
+    public static Specification<UserTransaction> emailOrUniqueIdLike(String s) {
         return (root, query, builder) ->
                 s == null ?
                         builder.conjunction() :
                         builder.or(
                                 builder.like(
-                                        builder.upper(root.get("user").get("username")),
+                                        builder.upper(root.get("user").get("email")),
                                         "%"+s.toUpperCase()+"%"
                                 ),
                                 builder.like(
