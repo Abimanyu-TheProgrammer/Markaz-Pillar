@@ -52,6 +52,7 @@ public class AdminProgramController {
         entity.setThumbnailURL(thumbnailURL);
         entity.setDescription(detail.getDescription());
         entity.setBenefit(detail.getBenefit());
+        entity.setTerm(detail.getTerm());
         entity.setVolunteerNeeded(detail.getVolunteerNeeded());
         entity.setLocation(detail.getLocation());
         entity.setSchedule(detail.getSchedule());
@@ -79,6 +80,7 @@ public class AdminProgramController {
         entity.setSlug(new Slugify().slugify(detail.getName()));
         entity.setDescription(detail.getDescription());
         entity.setBenefit(detail.getBenefit());
+        entity.setTerm(detail.getTerm());
         entity.setVolunteerNeeded(detail.getVolunteerNeeded());
         entity.setLocation(detail.getLocation());
         entity.setSchedule(detail.getSchedule());

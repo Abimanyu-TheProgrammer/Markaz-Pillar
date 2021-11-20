@@ -72,8 +72,8 @@ public class AdminTestimonyController {
     )
     @ResponseMessage("Testimony is updated!")
     public TestimonyDTO updateById(@RequestParam int id,
-                                          @RequestPart(required = false) MultipartFile thumbnail,
-                                          @RequestPart @Valid TestimonyRequestDTO detail) throws IOException {
+                                   @RequestPart(required = false) MultipartFile thumbnail,
+                                   @RequestPart @Valid TestimonyRequestDTO detail) throws IOException {
         ProgramTestimony entity = testimonyRepository.getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Testimony not found"));
 

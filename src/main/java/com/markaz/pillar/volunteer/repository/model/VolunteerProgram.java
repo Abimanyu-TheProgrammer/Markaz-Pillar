@@ -73,7 +73,7 @@ public class VolunteerProgram {
     @Column(name = "volunteer_needed")
     private Integer volunteerNeeded;
 
-    @Formula("coalesce((select sum(u.amount) " +
+    @Formula("coalesce((select count(t.id) " +
             "from volunteer_registration t " +
             "where t.program_id = id and t.status = 'PENDAFTARAN_DITERIMA'" +
             "group by t.program_id), 0)")

@@ -63,6 +63,10 @@ public class VolunteerProgramDTO {
                 .volunteerNeeded(obj.getVolunteerNeeded())
                 .volunteerApplied(obj.getVolunteerApplied())
                 .location(obj.getLocation())
+                .term(obj.getTerm())
+                .benefit(obj.getBenefit())
+                .schedule(obj.getSchedule())
+                .createdAt(obj.getCreatedAt())
                 .testimonies(
                         obj.getTestimonies().stream()
                                 .map(TestimonyDTO::mapFrom)
