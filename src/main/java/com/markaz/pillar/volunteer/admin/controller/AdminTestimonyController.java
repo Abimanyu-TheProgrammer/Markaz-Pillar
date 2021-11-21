@@ -43,6 +43,14 @@ public class AdminTestimonyController {
         this.testimonyRepository = testimonyRepository;
     }
 
+    @GetMapping(params = {"id"})
+    public TestimonyDTO getTestimonyByID(@RequestParam int id) {
+        return TestimonyDTO.mapFrom(
+                testimonyRepository.getById(id)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Testimony not found!"))
+        );
+    }
+
     @PostMapping(params = {"program_id"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public TestimonyDTO createTestimony(@RequestParam(name = "program_id") Integer id,
                                         @RequestPart MultipartFile thumbnail,

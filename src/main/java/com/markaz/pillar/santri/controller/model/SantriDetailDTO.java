@@ -23,6 +23,9 @@ public class SantriDetailDTO {
     private Integer id;
 
     @NotNull
+    private String donationId;
+
+    @NotNull
     private MarkazDetailDTO markaz;
 
     @NotNull
@@ -72,7 +75,9 @@ public class SantriDetailDTO {
 
         if(!obj.getDonationDetails().isEmpty()) {
             DonationDetail donationDetail = obj.getDonationDetails().get(0);
-            builder = builder.description(donationDetail.getDescription())
+            builder = builder
+                    .donationId(donationDetail.getUniqueId())
+                    .description(donationDetail.getDescription())
                     .nominal(donationDetail.getNominal())
                     .donated(donationDetail.getDonated())
                     .progress(

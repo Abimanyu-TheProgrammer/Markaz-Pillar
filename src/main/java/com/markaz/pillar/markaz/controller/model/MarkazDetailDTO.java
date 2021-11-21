@@ -25,6 +25,9 @@ public class MarkazDetailDTO {
     private Integer id;
 
     @NotNull
+    private String donationId;
+
+    @NotNull
     @ToString.Include
     private String name;
 
@@ -72,7 +75,9 @@ public class MarkazDetailDTO {
 
         if(!obj.getDonationDetails().isEmpty()) {
             DonationDetail donationDetail = obj.getDonationDetails().get(0);
-            builder = builder.donationCategories(donationDetail.getCategories())
+            builder = builder
+                    .donationId(donationDetail.getUniqueId())
+                    .donationCategories(donationDetail.getCategories())
                     .description(donationDetail.getDescription())
                     .nominal(donationDetail.getNominal())
                     .donated(donationDetail.getDonated())
