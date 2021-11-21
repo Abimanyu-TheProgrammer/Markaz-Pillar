@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UserTransactionRepository extends
         JpaRepository<UserTransaction, Integer>, JpaSpecificationExecutor<UserTransaction> {
+    Optional<UserTransaction> getById(int id);
     Optional<UserTransaction> findByTrxId(String trxId);
 
     Page<UserTransaction> findAllByUser(AuthUser user, Pageable pageable);

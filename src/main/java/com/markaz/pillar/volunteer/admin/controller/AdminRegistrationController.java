@@ -29,19 +29,14 @@ public class AdminRegistrationController {
     }
 
     @GetMapping(params = {"id"})
-    public RegistrationDTO getByID(@RequestParam int id) {
-        return RegistrationDTO.mapFrom(
-                repository.getById(id)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registration not found!"))
-        );
-    }
-
-    @GetMapping
-    public Page<RegistrationDTO> fetchAllRegistration(@RequestParam(defaultValue = "0") int page,
+    public Page<RegistrationDTO> fetchAllRegistration(@RequestParam Integer id,
+                                                      @RequestParam(defaultValue = "0") int page,
                                                       @RequestParam(defaultValue = "10") int n,
                                                       @RequestParam(required = false) String name,
                                                       @RequestParam(required = false) RegistrationStatus status) {
-        Specification<VolunteerRegistration> specification = RegistrationSpecs.nameLike(name)
+        Specification<VolunteerRegistration> specification = RegistrationSpecs
+                .programIdEqual(id)
+                .and(RegistrationSpecs.nameLike(name))
                 .and(RegistrationSpecs.statusEqual(status));
 
         return repository.findAll(specification, PageRequest.of(page, n))

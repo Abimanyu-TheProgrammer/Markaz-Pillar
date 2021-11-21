@@ -9,6 +9,13 @@ public class RegistrationSpecs {
         throw new IllegalStateException("Utility Class");
     }
 
+    public static Specification<VolunteerRegistration> programIdEqual(Integer id) {
+        return (root, query, builder) ->
+                id == null ?
+                        builder.conjunction() :
+                        builder.equal(root.get("program").get("id"), id);
+    }
+
     public static Specification<VolunteerRegistration> nameLike(String name) {
         return (root, query, builder) ->
                 name == null ?
