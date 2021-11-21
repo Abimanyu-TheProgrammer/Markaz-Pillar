@@ -24,7 +24,6 @@ public class MarkazDetailDTO {
     @NotNull
     private Integer id;
 
-    @NotNull
     private String donationId;
 
     @NotNull

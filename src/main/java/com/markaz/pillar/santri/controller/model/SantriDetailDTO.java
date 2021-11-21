@@ -22,7 +22,6 @@ public class SantriDetailDTO {
     @NotNull
     private Integer id;
 
-    @NotNull
     private String donationId;
 
     @NotNull
