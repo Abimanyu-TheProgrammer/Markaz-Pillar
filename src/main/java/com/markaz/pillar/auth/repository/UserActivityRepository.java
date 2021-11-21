@@ -57,6 +57,8 @@ public class UserActivityRepository {
                 case DITERIMA:
                     whereQuery += "'DONASI_DITERIMA'";
                     break;
+                default:
+                    whereQuery = "";
             }
         }
 
@@ -87,6 +89,8 @@ public class UserActivityRepository {
                 case DITERIMA:
                     whereQuery += "'PENDAFTARAN_DITERIMA'";
                     break;
+                default:
+                    whereQuery = "";
             }
         }
 

@@ -4,7 +4,7 @@ import com.markaz.pillar.donation.repository.model.DonationDetail;
 import com.markaz.pillar.transaction.repository.model.UserTransaction;
 import org.springframework.data.jpa.domain.Specification;
 
-public class TransactionSpecs {
+public final class TransactionSpecs {
     private TransactionSpecs() {
         throw new IllegalStateException("Utility Class");
     }

@@ -4,7 +4,7 @@ import com.markaz.pillar.volunteer.repository.model.RegistrationStatus;
 import com.markaz.pillar.volunteer.repository.model.VolunteerRegistration;
 import org.springframework.data.jpa.domain.Specification;
 
-public class RegistrationSpecs {
+public final class RegistrationSpecs {
     private RegistrationSpecs() {
         throw new IllegalStateException("Utility Class");
     }
