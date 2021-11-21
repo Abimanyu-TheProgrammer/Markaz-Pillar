@@ -17,11 +17,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Random;
+
 @RestController
 @RequestMapping("/volunteer")
 @PreAuthorize("permitAll()")
 public class VolunteerController {
     private ProgramRepository repository;
+    private Random randomUtil;
+
+    @Autowired
+    public void setRandomUtil(Random randomUtil) {
+        this.randomUtil = randomUtil;
+    }
 
     @Autowired
     public void setRepository(ProgramRepository repository) {
@@ -52,5 +60,20 @@ public class VolunteerController {
 
         return repository.findAll(specification, PageRequest.of(page, n))
                 .map(VolunteerProgramSimpleDTO::mapFrom);
+    }
+
+    @GetMapping("/random")
+    public VolunteerProgramSimpleDTO fetchRandomHeroProgram() {
+        long count = repository.count();
+        int index = randomUtil.nextInt((int) count);
+
+        Page<VolunteerProgram> programs = repository.findAll(PageRequest.of(index, 1));
+        if(programs.hasContent()) {
+            VolunteerProgram program = programs.getContent().get(0);
+
+            return VolunteerProgramSimpleDTO.mapFrom(program);
+        }
+
+        return null;
     }
 }

@@ -7,10 +7,17 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Random;
+
 @Configuration
 public class AppConfig {
     @Value("${service.cache.spec}")
     private String caffeineSpec;
+
+    @Bean
+    public Random random() {
+        return new Random();
+    }
 
     @Bean
     public CacheManager cacheManager() {
