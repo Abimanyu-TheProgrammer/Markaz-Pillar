@@ -40,11 +40,17 @@ public class UserTransaction {
     @NotBlank
     private String trxId;
 
-    @ManyToOne(targetEntity = DonationDetail.class, cascade = CascadeType.ALL)
+    @ManyToOne(
+            targetEntity = DonationDetail.class,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
+    )
     @JoinColumn(name = "donation_id", nullable = false)
     private DonationDetail donationDetail;
 
-    @ManyToOne(targetEntity = AuthUser.class, cascade = CascadeType.ALL)
+    @ManyToOne(
+            targetEntity = AuthUser.class,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
+    )
     @JoinColumn(name = "user_id", nullable = false)
     private AuthUser user;
 
@@ -61,6 +67,7 @@ public class UserTransaction {
     @NotNull
     private TransactionStatus status = TransactionStatus.MENUNGGU_KONFIRMASI;
 
+    @Size(max = 2048)
     private String reason;
 
     @CreatedDate

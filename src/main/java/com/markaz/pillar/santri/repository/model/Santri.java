@@ -37,7 +37,7 @@ public class Santri {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne(targetEntity = Markaz.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Markaz.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "markaz_id", nullable = false)
     private Markaz markaz;
 

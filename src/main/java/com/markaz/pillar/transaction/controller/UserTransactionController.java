@@ -7,7 +7,7 @@ import com.markaz.pillar.markaz.repository.MarkazRepository;
 import com.markaz.pillar.markaz.repository.model.Markaz;
 import com.markaz.pillar.santri.repository.SantriRepository;
 import com.markaz.pillar.santri.repository.model.Santri;
-import com.markaz.pillar.tools.file.impl.RollingFileStorage;
+import com.markaz.pillar.tools.file.impl.RollingImageStorage;
 import com.markaz.pillar.tools.sequence.SequenceGenerator;
 import com.markaz.pillar.transaction.controller.model.TransactionDTO;
 import com.markaz.pillar.transaction.controller.model.TransactionRequestDTO;
@@ -36,7 +36,7 @@ public class UserTransactionController {
     private SantriRepository santriRepository;
     private UserRepository userRepository;
     private SequenceGenerator sequenceGenerator;
-    private RollingFileStorage fileStorage;
+    private RollingImageStorage fileStorage;
 
     @Autowired
     public void setSantriRepository(SantriRepository santriRepository) {
@@ -44,7 +44,7 @@ public class UserTransactionController {
     }
 
     @Autowired
-    public void setFileStorage(RollingFileStorage fileStorage) {
+    public void setFileStorage(RollingImageStorage fileStorage) {
         this.fileStorage = fileStorage;
     }
 

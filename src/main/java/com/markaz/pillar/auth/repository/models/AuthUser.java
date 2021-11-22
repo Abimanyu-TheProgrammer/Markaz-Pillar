@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.markaz.pillar.auth.google.repository.model.GoogleToken;
 import com.markaz.pillar.config.validation.ValidPassword;
 import com.markaz.pillar.transaction.repository.model.UserTransaction;
+import com.markaz.pillar.volunteer.repository.model.VolunteerRegistration;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -84,6 +86,7 @@ public class AuthUser {
     private String phoneNum;
 
     @NotBlank
+    @Size(max = 4096)
     private String address;
 
     @CreatedDate
@@ -98,5 +101,8 @@ public class AuthUser {
     private boolean isActive = true;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
-    private Set<UserTransaction> donations;
+    private Set<UserTransaction> donations = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<VolunteerRegistration> registrations = new HashSet<>();
 }

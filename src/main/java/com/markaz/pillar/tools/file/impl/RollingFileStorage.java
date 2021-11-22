@@ -1,6 +1,7 @@
 package com.markaz.pillar.tools.file.impl;
 
 import com.markaz.pillar.tools.file.FileStorageService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -9,10 +10,19 @@ import java.util.List;
 
 @Service("rollingFileStorage")
 public class RollingFileStorage extends FileStorageService {
+    @Value("#{'${service.storage.file.allowed-content-types}'.split(',')}")
+    private List<String> contentTypes;
+
+    @Value("${service.storage.file.max-file-size}")
+    private String maxFileSize;
+
     @Override
     public String getDirectory() {
         Calendar systemDate = Calendar.getInstance();
-        return String.format("%s/%d/%d", getDir(), systemDate.get(Calendar.YEAR), systemDate.get(Calendar.MONTH)+1);
+        return String.format(
+                "%s/file/%d/%d",
+                getDir(), systemDate.get(Calendar.YEAR), systemDate.get(Calendar.MONTH)+1
+        );
     }
 
     @Override
@@ -27,6 +37,11 @@ public class RollingFileStorage extends FileStorageService {
 
     @Override
     protected List<String> getAllowedContentType() {
-        return getContentTypes();
+        return contentTypes;
+    }
+
+    @Override
+    protected String getAllowedFileSize() {
+        return maxFileSize;
     }
 }

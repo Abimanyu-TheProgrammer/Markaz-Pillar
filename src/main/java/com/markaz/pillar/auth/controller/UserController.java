@@ -1,11 +1,21 @@
 package com.markaz.pillar.auth.controller;
 
 import com.markaz.pillar.auth.admin.model.AuthUserDTO;
+import com.markaz.pillar.auth.controller.model.Activity;
+import com.markaz.pillar.auth.controller.model.ActivityStatus;
+import com.markaz.pillar.auth.controller.model.ActivityType;
 import com.markaz.pillar.auth.controller.model.EditProfileRequestDTO;
+import com.markaz.pillar.auth.repository.UserActivityRepository;
 import com.markaz.pillar.auth.repository.UserRepository;
 import com.markaz.pillar.auth.repository.models.AuthUser;
-import com.markaz.pillar.tools.file.impl.StaticFileStorage;
+import com.markaz.pillar.tools.file.impl.StaticImageStorage;
+import com.markaz.pillar.transaction.controller.model.TransactionDTO;
+import com.markaz.pillar.transaction.repository.model.UserTransaction;
+import com.markaz.pillar.volunteer.admin.controller.model.RegistrationDTO;
+import com.markaz.pillar.volunteer.repository.model.VolunteerRegistration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +32,13 @@ import java.security.Principal;
 @PreAuthorize("isAuthenticated()")
 public class UserController {
     private UserRepository repository;
-    private StaticFileStorage fileStorage;
+    private UserActivityRepository activityRepository;
+    private StaticImageStorage fileStorage;
+
+    @Autowired
+    public void setActivityRepository(UserActivityRepository activityRepository) {
+        this.activityRepository = activityRepository;
+    }
 
     @Autowired
     public void setRepository(UserRepository repository) {
@@ -30,7 +46,7 @@ public class UserController {
     }
 
     @Autowired
-    public void setFileStorage(StaticFileStorage fileStorage) {
+    public void setFileStorage(StaticImageStorage fileStorage) {
         this.fileStorage = fileStorage;
     }
 
@@ -61,5 +77,25 @@ public class UserController {
         }
 
         return AuthUserDTO.mapFrom(repository.save(user));
+    }
+
+    @GetMapping("/activity")
+    public Page<Activity> fetchAllUserActivity(@RequestParam(defaultValue = "ALL") ActivityType type,
+                                               @RequestParam(required = false) ActivityStatus status,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "10") int n) {
+        return activityRepository.fetchAllUserActivity(type, status, PageRequest.of(page, n))
+                .map(activity -> {
+                    ActivityType activityType = ActivityType.valueOf(activity.getType());
+                    if(activityType.equals(ActivityType.VOLUNTEER)) {
+                        activity.setData(RegistrationDTO.mapFrom((VolunteerRegistration) activity.getData()));
+                    } else if(activityType.equals(ActivityType.TRANSACTION)) {
+                        activity.setData(TransactionDTO.mapFrom((UserTransaction) activity.getData()));
+                    } else {
+                        throw new IllegalStateException("Unsupported function!");
+                    }
+
+                    return activity;
+                });
     }
 }

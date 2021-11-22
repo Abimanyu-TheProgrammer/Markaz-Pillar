@@ -18,6 +18,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -44,7 +45,7 @@ public class DonationDetail {
     @ToString.Include
     private String name;
 
-    @ManyToOne(targetEntity = Markaz.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Markaz.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "markaz_id")
     private Markaz markaz;
 
@@ -54,7 +55,7 @@ public class DonationDetail {
     @Column(name="category")
     private Set<MarkazDonationCategory> categories;
 
-    @ManyToOne(targetEntity = Santri.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Santri.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "santri_id")
     private Santri santri;
 
@@ -82,4 +83,7 @@ public class DonationDetail {
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "donation", orphanRemoval = true, cascade = CascadeType.ALL)
+    private Set<DonationProgress> progresses = new HashSet<>();
 }

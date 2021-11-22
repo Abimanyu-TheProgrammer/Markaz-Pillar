@@ -12,6 +12,10 @@ import com.markaz.pillar.auth.jwt.repository.model.AuthRefresh;
 import com.markaz.pillar.auth.jwt.service.AuthenticationService;
 import com.markaz.pillar.auth.jwt.service.JwtUserDetailsService;
 import com.markaz.pillar.config.controller.model.annotation.ResponseMessage;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +37,7 @@ import java.util.Set;
 @RestController
 @PreAuthorize("permitAll()")
 @RequestMapping("/authenticate")
+@Slf4j
 public class JwtAuthenticationController {
     private TokenRepository repository;
     private JwtTokenUtil jwtTokenUtil;
@@ -68,27 +73,34 @@ public class JwtAuthenticationController {
     }
 
     @PostMapping("/validate")
-    public String validateToken(@RequestBody @Valid ValidateRequest request) {
+    @ResponseMessage("Token is Valid!")
+    public void validateToken(@RequestBody @Valid ValidateRequest request) {
         Set<GrantedAuthority> claimAuthorities = new HashSet<>();
         for(String authority : request.getAuthority()) {
             claimAuthorities.add(new SimpleGrantedAuthority(authority));
         }
 
-        String email = jwtTokenUtil.getEmailFromToken(request.getToken());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        if(!userDetails.isEnabled()) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    String.format("User %s is disabled", email)
-            );
-        } else if(!userDetails.getAuthorities().containsAll(claimAuthorities)) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    String.format("%s is not authorized for %s", email, new Gson().toJson(claimAuthorities))
-            );
-        }
+        try {
+            String email = jwtTokenUtil.getEmailFromToken(request.getToken());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            if(!userDetails.isEnabled()) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        String.format("User %s is disabled", email)
+                );
+            } else if(!userDetails.getAuthorities().containsAll(claimAuthorities)) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        String.format("%s is not authorized for %s", email, new Gson().toJson(claimAuthorities))
+                );
+            }
+        } catch (MalformedJwtException | SignatureException e) {
+            log.error(String.format("Validation Attempt, Token %s is malformed!", request.getToken()), e);
 
-        return "OK";
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Token is malformed!");
+        } catch (ExpiredJwtException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token has expired!");
+        }
     }
 
     @PostMapping("/refresh")

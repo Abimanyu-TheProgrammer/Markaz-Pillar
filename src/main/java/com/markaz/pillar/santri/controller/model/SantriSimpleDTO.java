@@ -45,6 +45,9 @@ public class SantriSimpleDTO {
     @NotNull
     private MarkazSimpleDTO markaz;
 
+    @NotNull
+    private Boolean hasDonation;
+
     public static SantriSimpleDTO mapFrom(Santri obj) {
         return builder()
                 .id(obj.getId())
@@ -57,6 +60,7 @@ public class SantriSimpleDTO {
                 .birthDate(obj.getBirthDate())
                 .thumbnailURL(obj.getThumbnailURL())
                 .markaz(MarkazSimpleDTO.mapFrom(obj.getMarkaz()))
+                .hasDonation(!obj.getDonationDetails().isEmpty())
                 .build();
     }
 }
